@@ -45,14 +45,14 @@ def authenticate_with_ad(username: str, password: str):
 
 def get_redirect_url(username: str) -> str:
     user_routes = {
-        "gabriel.rocha" : "Gerencia",
+        "gabriel.rocha" : "MeM",
         "vleite" : "Arq",
         "rodrigo.pessoa" : "Bio",
         "tlima" : "Esp",
         "llacerda" : "Geo",
         "agobira" : "Hum",
-        "vinicius.santos" : "MF",
-        "clisboa" : "Mod",
+        "vinicius.santos" : "MeM",
+        "clisboa" : "MeM",
         "lthays" : "Gerencia",
         "msantos" : "Gerencia"
     }
@@ -84,7 +84,7 @@ async def logar(username: str = Form(...), password: str = Form(...)):
 #inicio endpoints agenda
 
 @app.get("/{hub}")
-async def CadNaoProgramadas(
+async def index_hubs(
     request: Request,
     hub: str,
 ):
@@ -94,9 +94,10 @@ async def CadNaoProgramadas(
         "Esp": ("Esp", "./Espeleologia/index.html"),
         "Geo": ("Geo", "./Geo/index.html"),
         "Hum": ("Hum", "./Humanidades/index.html"),
+        "MeM": ("MeM", "./mem.html"),
+        "Gerencia": ("Gerencia", "./Gerencia/index.html"),
         "MF": ("MF", "./MeioFisico/index.html"),
         "Mod": ("Mod", "./Modelagens/index.html"),
-        "Gerencia": ("Gerencia", "./Gerencia/index.html"),
     }
 
     model, caminho = mapa_models.get(hub, (None, None))
@@ -111,5 +112,34 @@ async def CadNaoProgramadas(
             "request": request,
         },
     )
+
+@app.get("/PowerBi/{hub}")
+async def powerbi_hubs(
+    request: Request,
+    hub: str,
+):
+    mapa_models = {
+        "Arq": ("PowerBiArq", "./Arqueologia/PowerBi.html"),
+        "Bio": ("PowerBiBio", "./Biodiversidade/PowerBi.html"),
+        "Esp": ("PowerBiEsp", "./Espeleologia/PowerBi.html"),
+        "Geo": ("PowerBiGeo", "./Geo/PowerBi.html"),
+        "Hum": ("PowerBiHum", "./Humanidades/PowerBi.html"),
+        "MF": ("PowerBiMF", "./MeioFisico/PowerBi.html"),
+        "Mod": ("PowerBiMod", "./Modelagens/PowerBi.html"),
+    }
+
+    model, caminho = mapa_models.get(hub, (None, None))
+
+    if not model or not caminho:
+        return {"error": f"O hub '{hub}' não é válido."}
+
+    return templates.TemplateResponse(
+        caminho,
+        {
+            "config": config,
+            "request": request,
+        },
+    )
+
 
 #fim endpoints agenda

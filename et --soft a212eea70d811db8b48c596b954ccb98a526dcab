@@ -1,0 +1,23 @@
+[33mcommit 710e77cd2eb49b3291ad68dc57db5c51d03cb6e9[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: Gabriel Rocha - Brandt <gabriel.rocha@brandt.local>
+Date:   Mon Apr 14 17:46:25 2025 -0300
+
+    Cria
+
+[33mcommit a212eea70d811db8b48c596b954ccb98a526dcab[m
+Author: Gabriel Rocha - Brandt <gabriel.rocha@brandt.local>
+Date:   Mon Apr 14 17:14:15 2025 -0300
+
+    Primeiro endpoint com redirecionamento para a pagina inicial de todos os Hubs e também da gerencia.
+
+[33mcommit 8db169ac793f1d4fabf7ab1647e10c2e3ef544e8[m
+Author: Gabriel Rocha - Brandt <gabriel.rocha@brandt.local>
+Date:   Mon Apr 14 15:27:23 2025 -0300
+
+    Login com LDAP e redirecionamento inicial feito, inicio agora das implementações do zero
+
+[33mcommit 6426083bf1a70f07008c0910affd75875b3877e7[m
+Author: Gabriel Rocha - Brandt <gabriel.rocha@brandt.local>
+Date:   Mon Apr 14 15:23:56 2025 -0300
+
+    Primeiro Commit
