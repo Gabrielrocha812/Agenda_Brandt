@@ -1,0 +1,54 @@
+{% extends "./Gerencia/Arqueologia/base.html" %}
+
+
+<!-- Specific CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+<div class="bgc-deep-green-500 ta-c p-30">
+  <h1 class="fw-300 mB-5 ">Aquisição</h1>
+</div>
+<main class=' bgc-grey-100'>
+
+  <table class="mt-1 table table-striped table-bordered" id="tabela" style="width:80%">
+    <thead>
+        <tr>
+            <th>Projeto</th>
+            <th>Atividade Macro</th>
+            <th>Atividade</th>
+            <th>Colaborador Responsável</th>
+            <th>Data inicio Netproject:</th>
+            <th>Data fim Netproject:</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for rs in data %}
+        <tr>
+            <td>{{ rs.cod_projeto_alfa }}</td>
+            <td>{{ rs.pai_aquisicao }}</td>
+            <td>{{ rs.nom_projeto }}</td>
+            <td>{{ rs.txt_comentario }}</td>
+            <td>{{ rs.dth_inicio_real }}</td>
+            <td>{{ rs.dth_fim_real }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+</div>
+<script>
+    $(document).ready(function(){
+
+        $("#tabela").DataTable({        
+        
+       language: {
+            url:"https://cdn.datatables.net/plug-ins/1.11.3/i18n/pt_br.json"
+          }
+          
+        });
+
+
+    })
+</script>    
+</main>
+
+{% endblock content %}
