@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <title>Login Agenda</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <link rel="stylesheet" href="../../static/assets/css/login.css">
+
+  <link rel="shortcut icon" href="/static/assets/images/favicon.ico" type="image/x-icon">
+</head>
+
+<body class="img" style="
+    height: 100vh;
+    background-image: url('/../../static/assets/images/bg_login.jpg');">
+
+  <form>
+
+    <div class="container"
+      style="background-color:#000000ce; border-radius: 2%;position: absolute;top: 50%;left: 50%;margin-right: -50%;transform: translate(-50%, -50%);width: 500px;height: 400px;">
+      <div class="row px-0 py-12">
+        <div class="container-fluid mt-4">
+
+          <h2 class="text-center text-white ">Agenda Brandt</h2>
+
+          <div class="col-lg-12 d-flex justify-content-center ">
+            <div class="flex col-lg-9">
+              <label for="email" class="p-1 text-white">Email:</label>
+              <input type="text" name="email" id="email" class="form-control " placeholder="Digite seu email" required>
+            </div>
+          </div>
+          <div class="col-lg-12 d-flex justify-content-center ">
+            <div class="flex col-lg-9">
+              <label for="password" class="p-1 text-white">Senha:</label>
+              <input type="password" name="password" id="password" class="form-control" placeholder="Digite sua senha"
+                required>
+            </div>
+          </div>
+
+
+          <div class="col text-center p-3">
+            <input type="button" value="Login" class="form-control btn" style="width: 300px;" onClick="redirectToPage(this.form)">
+          </div>
+
+  </form>
+</body>
+
+<script type="text/javascript">
+  function redirectToPage(form) {
+    // Mapeamento de e-mails para páginas
+    var emailToPageMap = {
+      "msantos@brandt.com.br": "Gerencia",
+      "rodrigo.pessoa@brandt.com.br": "Bio",
+      "llacerda@brandt.com.br": "Geo",
+      "cristiano.lisboa@brandt.com.br": "MeM",
+      "valdiney.leite@brandt.com.br": "Arq",
+      "tlima@brandt.com.br": "Esp",
+      "rlopes@brandt.com.br": "Esp",
+      "agobira@brandt.com.br": "Hum",
+      "lthays@brandt.com.br": "Gerencia",
+      "gsoares@brandt.com.br": "Esp"
+    };
+
+    var email = form.email.value;
+    var password = form.password.value;
+
+    if (emailToPageMap.hasOwnProperty(email)) {
+      if (password === "bma@2024") {
+        location.href = emailToPageMap[email];
+      } else {
+        alert("Email ou senha inválido!");
+      }
+    } else {
+      alert("Email ou senha inválido!");
+    }
+  }
+</script>
+
+</html>

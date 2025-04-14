@@ -1,0 +1,60 @@
+{
+    "itens": [
+        {
+            "id": 1,
+            "href": "/index",
+            "name": "Dashboard",
+            "classe": "c-blue-500 ti-home",
+            "active": false,
+            "parent": 99
+        },
+        {
+            "id": 2,
+            "href": "/email",
+            "name": "Email",
+            "classe": "c-brown-500 ti-email",
+            "active": false,
+            "parent": 99
+        },
+        {
+            "id": 3,
+            "href": "/compose",
+            "name": "Compose",
+            "classe": "c-blue-500 ti-share",
+            "active": false,
+            "parent": 99
+        },
+        {
+            "id": 4,
+            "href": "/calendar",
+            "name": "Calendar",
+            "classe": "c-deep-orange-500 ti-calendar",
+            "active": false,
+            "parent": 99
+        },
+        {
+            "id": 5,
+            "href": "/chat",
+            "name": "Chat",
+            "classe": "c-deep-purple-500 ti-comment-alt",
+            "active": false,
+            "parent": 99
+        },
+        {
+            "id": 6,
+            "href": "/charts",
+            "name": "Charts",
+            "classe": "c-indigo-500 ti-bar-chart",
+            "active": false,
+            "parent": 99
+        },
+        {
+            "id": 7,
+            "href": "/forms",
+            "name": "Forms",
+            "classe": "c-light-blue-500 ti-pencil",
+            "active": false,
+            "parent": 99
+        }
+    ]
+}

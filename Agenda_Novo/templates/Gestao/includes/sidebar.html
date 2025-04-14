@@ -1,0 +1,272 @@
+<style>
+  
+  .submenu {
+    display: none;
+  }
+  
+  .nav-item:hover .submenu {
+    display: block;
+  }
+  
+  
+  </style>
+    <link rel="shortcut icon" href="/static/assets/images/favicon.ico" type="image/x-icon">
+
+      <div class="sidebar">
+        <div class="sidebar-inner">
+          <!-- ### $Sidebar Header ### -->
+          <div class="sidebar-logo">
+            <div class="peers ai-c fxw-nw">
+              <div class="peer peer-greed">
+                <a class="sidebar-link td-n" href="/">
+                  <div class="peers ai-c fxw-nw">
+                    <div class="peer">
+                      <div class="logo">
+
+                        <style>
+                          .logo_brandt {
+                              width: 50px;
+                              margin-left: 10px;
+                              margin-top: 5px;
+                            }
+                        </style>
+                        <img src="{{ config.ASSETS_ROOT }}/images/logo_brandt.png" alt="" class="logo_brandt">
+                        <script src="https://kit.fontawesome.com/08d351cb4a.js" crossorigin="anonymous"></script>
+
+                      </div>
+                    </div>
+                    <div class="peer peer-greed">
+                      <h5 class="lh-1 mB-0 logo-text">Brandt Meio Ambiente</h5>
+                    </div>
+                  </div>
+                </a>
+              </div>
+              <div class="peer">
+                <div class="mobile-toggle sidebar-toggle">
+                  <a href="" class="td-n">
+                    <i class="ti-arrow-circle-left"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+         <!-- ### $Sidebar Menu ### -->
+<ul class="sidebar-menu scrollable pos-r">
+  {% for i in config.SIDEBAR %}
+    <li class="nav-item">
+      <a class='sidebar-link' href="{{ i.href }}">
+        <span class="icon-holder">
+          <i class="{{ i.classe }}"></i>
+        </span>
+        <span class="title">{{ i.name }}</span>
+      </a>
+    </li>
+  {% endfor %}
+
+  <li class="sidebar-item">
+    <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse" data-bs-target="#auth"
+      aria-expanded="false" aria-controls="auth">
+      <span class="icon-holder">
+        <i class="fa-solid fa-compass-drafting"></i>
+      </span>
+      <span class="title">Arqueologia</span>
+    </a>
+    <ul id="auth" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+      <li>
+        <a href="/ArqNetprojectGe" class="ml-3">Dados Netproject</a>
+      </li>
+      <li>
+        <a href="/ArqAgendaGe" class="ml-3">Agenda</a>
+      </li>
+      <li>
+        <a href="/PowerBiArqGe" class="ml-3">Power Bi</a>
+      </li>
+      <li>
+        <a href="/CalendarioArqGe" class="ml-3">Calendário</a>
+      </li>
+      <li><a href="/Aquisicao/ArqGe" class="ml-3">Aquisições</a></li>
+
+    </ul>
+  </li>
+
+  <li class="sidebar-item">
+    <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse" data-bs-target="#auth2"
+      aria-expanded="false" aria-controls="auth2">
+      <span class="icon-holder">
+        <i class="fa-brands fa-pagelines"></i>
+      </span>
+      <span class="title">Biodiversidade</span>
+    </a>
+    <ul id="auth2" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+      <li>
+        <a href="/BioNetprojectGe" class="ml-3">Dados Netproject</a>
+      </li>
+      <li>
+        <a href="/BioAgendaGe" class="ml-3">Agenda</a>
+      </li>
+      <li>
+        <a href="/PowerBiBioGe" class="ml-3">Power Bi</a>
+      </li>
+      <li>
+        <a href="/CalendarioBioGe" class="ml-3">Calendário</a>
+      </li>
+      <li><a href="/Aquisicao/BioGe" class="ml-3">Aquisições</a></li>
+
+    </ul>
+  </li>
+
+  <li class="sidebar-item">
+    <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse" data-bs-target="#auth3"
+      aria-expanded="false" aria-controls="auth3">
+      <span class="icon-holder">
+        <i class="fa-solid fa-helmet-safety"></i>
+      </span>
+      <span class="title">Espeleologia</span>
+    </a>
+    <ul id="auth3" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+      <li>
+        <a href="/EspNetprojectGe" class="ml-3">Dados Netproject</a>
+      </li>
+      <li>
+        <a href="/EspAgendaGe" class="ml-3">Agenda</a>
+      </li>
+      <li>
+        <a href="/PowerBiEspGe" class="ml-3">Power Bi</a>
+      </li>
+      <li>
+        <a href="/CalendarioEspGe" class="ml-3">Calendário</a>
+      </li>
+      <li><a href="/Aquisicao/EspGe" class="ml-3">Aquisições</a></li>
+
+    </ul>
+  </li>
+
+  <li class="sidebar-item">
+    <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse" data-bs-target="#auth9"
+      aria-expanded="false" aria-controls="auth9">
+      <span class="icon-holder">
+        <i class="fa-solid fa-laptop-code"></i>
+      </span>
+      <span class="title">Geointeligência</span>
+    </a>
+    <ul id="auth9" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+      <li>
+        <a href="/GeoNetprojectGe" class="ml-3">Dados Netproject</a>
+      </li>
+      <li>
+        <a href="/GeoAgendaGe" class="ml-3">Agenda</a>
+      </li>
+      <li>
+        <a href="/PowerBiGe" class="ml-3">Power Bi</a>
+      </li>
+      <li>
+        <a href="/CalendarioGe" class="ml-3">Calendário</a>
+      </li>
+              <li><a href="/Aquisicao/GeoGe" class="ml-3">Aquisições</a></li>
+
+    </ul>
+  </li>
+
+  <li class="sidebar-item">
+    <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse" data-bs-target="#auth5"
+      aria-expanded="false" aria-controls="auth5">
+      <span class="icon-holder">
+        <i class="fa-solid fa-people-roof"></i>
+      </span>
+      <span class="title">Humanidades</span>
+    </a>
+    <ul id="auth5" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+      <li>
+        <a href="/HumNetprojectGe" class="ml-3">Dados Netproject</a>
+      </li>
+      <li>
+        <a href="/HumAgendaGe" class="ml-3">Agenda</a>
+      </li>
+      <li>
+        <a href="/PowerBiHumGe" class="ml-3">Power Bi</a>
+      </li>
+      <li>
+        <a href="/CalendarioHumGe" class="ml-3">Calendário</a>
+      </li>
+              <li><a href="/Aquisicao/HumGe" class="ml-3">Aquisições</a></li>
+
+    </ul>
+  </li>
+
+  <li class="sidebar-item">
+    <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse" data-bs-target="#auth6"
+      aria-expanded="false" aria-controls="auth6">
+      <span class="icon-holder">
+        <i class="fa-solid fa-seedling"></i>
+      </span>
+      <span class="title">Meio Físico</span>
+    </a>
+    <ul id="auth6" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+      <li>
+        <a href="/MFNetprojectGe" class="ml-3">Dados Netproject</a>
+      </li>
+      <li>
+        <a href="/MFAgendaGe" class="ml-3">Agenda</a>
+      </li>
+      <li>
+        <a href="/PowerBiMFGe" class="ml-3">Power Bi</a>
+      </li>
+      <li>
+        <a href="/CalendarioMFGe" class="ml-3">Calendário</a>
+      </li>
+              <li><a href="/Aquisicao/MFGe" class="ml-3">Aquisições</a></li>
+
+    </ul>
+  </li>
+
+  <li class="sidebar-item">
+    <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse" data-bs-target="#auth7"
+      aria-expanded="false" aria-controls="auth7">
+      <span class="icon-holder">
+        <i class="fa-solid fa-layer-group"></i>
+      </span>
+      <span class="title">Modelagens</span>
+    </a>
+    <ul id="auth7" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+      <li>
+        <a href="/ModNetprojectGe" class="ml-3">Dados Netproject</a>
+      </li>
+      <li>
+        <a href="/ModAgendaGe" class="ml-3">Agenda</a>
+      </li>
+      <li>
+        <a href="/PowerBiModGe" class="ml-3">Power Bi</a>
+      </li>
+      <li>
+        <a href="/CalendarioModGe" class="ml-3">Calendário</a>
+      </li>
+              <li><a href="/Aquisicao/ModGe" class="ml-3">Aquisições</a></li>
+
+    </ul>
+  </li>
+
+  <li class="sidebar-item">
+    <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse" data-bs-target="#auth10"
+      aria-expanded="false" aria-controls="auth10">
+      <span class="icon-holder">
+        <i class="fa-solid fa-users"></i>
+      </span>
+      <span class="title">Coordenação Técnica</span>
+    </a>
+    <ul id="auth10" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+      <li>
+        <a href="/GestaoNetproject" class="ml-3">Dados Netproject</a>
+      </li>
+      <li>
+        <a href="/GestaoAgenda" class="ml-3">Agenda</a>
+      </li>
+      <li>
+        <a href="/PowerBiGestao" class="ml-3">Power Bi</a>
+      </li>
+    </ul>
+  </li>
+
+</ul>
+</div>
+</div>

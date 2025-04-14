@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block content %}
+<head>
+    <title>Painel de Administração</title>
+    <meta charset="utf-8">
+    <link href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="container mt-5">
+    <h2 class="text-center mb-4">Painel de Administração</h2>
+
+    <!-- Gerenciar Grupos -->
+    <div class="mb-5">
+        <h4>Gerenciar Grupos</h4>
+        <form id="create-group-form" class="form-inline mb-3" action="/create-group" method="post">
+            <input type="text" class="form-control mr-2" name="name" placeholder="Nome do Grupo" required>
+            <button type="submit" class="btn btn-primary">Criar Grupo</button>
+        </form>
+
+        <h5>Grupos Existentes:</h5>
+        <ul id="group-list" class="list-group">
+            {% for group in groups %}
+            <li class="list-group-item">
+                {{ group.name }}
+                <ul>
+                    <li><strong>Permissões:</strong></li>
+                    {% for permission in group.permissions %}
+                    <li>{{ permission.permission.name }}</li>
+                    {% endfor %}
+                </ul>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Criar Permissões -->
+    <div class="mb-5">
+        <h4>Criar Permissões</h4>
+        <form id="create-permission-form" class="form-inline mb-3" action="/create-permission" method="post">
+            <input type="text" class="form-control mr-2" name="name" placeholder="Nome da Permissão" required>
+            <button type="submit" class="btn btn-success">Criar Permissão</button>
+        </form>
+    </div>
+
+    <!-- Atribuir Permissões a Grupos -->
+    <div class="mb-5">
+        <h4>Atribuir Permissões a Grupos</h4>
+        <form id="assign-permission-form" class="form-inline" action="/assign-permission" method="post">
+            <select name="group_name" class="form-control mr-2" required>
+                <option value="" disabled selected>Selecionar Grupo</option>
+                {% for group in groups %}
+                <option value="{{ group.name }}">{{ group.name }}</option>
+                {% endfor %}
+            </select>
+            <select name="permission_name" class="form-control mr-2" required>
+                <option value="" disabled selected>Selecionar Permissão</option>
+                {% for permission in permissions %}
+                <option value="{{ permission.name }}">{{ permission.name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-warning">Atribuir Permissão</button>
+        </form>
+    </div>
+
+    <!-- Gerenciar Usuários -->
+    <div class="mb-5">
+        <h4>Gerenciar Usuários</h4>
+        <table id="user-table" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nome de Usuário</th>
+                    <th>Nome Completo</th>
+                    <th>Grupo Atual</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.full_name }}</td>
+                    <td>{{ user.group.name if user.group else "Sem Grupo" }}</td>
+                    <td>
+                        <form action="/assign-group" method="post">
+                            <input type="hidden" name="username" value="{{ user.username }}">
+                            <select name="group_name" class="form-control" required>
+                                <option value="" disabled selected>Selecionar Grupo</option>
+                                {% for group in groups %}
+                                <option value="{{ group.name }}">{{ group.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="btn btn-primary btn-sm mt-2">Atualizar Grupo</button>
+                        </form>
+                        
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#user-table').DataTable();
+        });
+    </script>
+</body>
+{% endblock content %}

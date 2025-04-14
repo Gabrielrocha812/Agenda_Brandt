@@ -1,0 +1,75 @@
+{% extends "./Gerencia/MeioFisico/base.html" %}
+
+{% block content %}
+<div class="col-lg-12  d-flex align-items-center justify-content-center">
+    <form id="formAdd" action="/addNaoProgramadasMFGe" method="post" class="col-lg-6">
+
+        <h2 class="mt-3 text-center">Demanda Não Planejada</h2>
+
+        <div class="mb-3">
+            <label for="titulo">Atividade:</label>
+            <input type="text" name="atividade" placeholder="Atividade" class="form-control" value="" >
+
+        </div>
+
+        <div class="mb-3">
+            <label for="status_projeto">Tipo de atividade:</label>
+    
+            <select name="status_projeto" id="status_projeto" class="form-select">
+                <option value="">Tipo de atividade</option>
+                <option value="Demanda não planejada">Demanda não planejada</option>
+                <option value="Férias">Férias</option>
+                <option value="Atestado médico">Atestado médico</option>
+                <option value="Consultor externo">Consultor externo</option>
+            </select>        
+        </div>        <input type="text" name="hub" value="MEIO FISICO E ENGENHARIA" hidden>
+
+        <div class="mb-3">
+            <label>Colaborador Responsável:
+            </label>
+            <input type="text" list="responsavel" name="responsavel" class="form-control" placeholder="Colaborador" />
+                <datalist id="responsavel">
+                    <option value="Cesar Augusto Horn">
+                    <option value="Fernando Antonio de Oliveira">
+                    <option value="Giovanna Neusa Fagundes Marciano">
+                    <option value="Marina Fonseca Cotta">
+                    <option value="Vinícius Rodrigues dos Santos">
+                </datalist>
+        </div>
+
+        <div class="mb-3">
+            <label for="projeto">Projeto:</label>
+            <input type="text" name="projeto" placeholder="Projeto" class="form-control" value="">
+        </div>
+
+        <div class="mb-3">
+            <label for="projeto">Data Início:</label>
+            <input type="date" name="dth_inicio" id="datareal"placeholder="Data início" class="form-control" value="" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="projeto">Data Fim:</label>
+            <input type="date" name="dth_fim" placeholder="Data fim" id="dataFimReal" class="form-control" value="" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="projeto">Horas:</label>
+            <input type="number" name="horas" id="horas" placeholder="Horas" class="form-control" value="" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="projeto">Observação:</label>
+            <input type="text" name="observacao" id="observacao" placeholder="Observação" class="form-control" value="" required>
+        </div>
+
+
+        <div class="col-lg-12">
+            <input type="submit" value="Salvar" class="btn btn-primary mb-3 btn-lg">
+        </div>
+    </form>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+
+{% endblock javascripts %}

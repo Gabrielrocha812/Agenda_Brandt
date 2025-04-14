@@ -1,0 +1,102 @@
+{% extends "./Gerencia/MeioFisico/base.html" %}
+
+{% block title %} Calendar {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.0/main.min.css" rel="stylesheet">
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+{% endblock stylesheets %}
+
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.0/main.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.10.0/locales/pt-br.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<main class='mt-3 bgc-grey-100'>
+  <div id='mainContent'>
+    <div class="row">
+      <div class="col-md-12">
+        <div id='calendar' class="ml-3 mr-3" style="width: 98%; max-height: 800px; overflow-y: auto;"></div>
+      </div>
+    </div>
+
+    <!-- Modal de Detalhes do Evento -->
+    <div class="modal fade" id="event-details" tabindex="-1" role="dialog" aria-labelledby="eventDetailsLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="eventDetailsLabel">Detalhes do Evento</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p><strong>Atividade:</strong> <span id="event-description"></span></p>
+            <p><strong>Atividade Macro:</strong> <span id="event-title"></span></p>
+            <p><strong>Colaborador:</strong> <span id="event-colaborador"></span></p>
+            <p><strong>Projeto:</strong> <span id="event-projeto"></span></p>
+            <p><strong>Data Início Agenda:</strong> <span id="event-start"></span></p>
+            <p><strong>Data Fim Agenda:</strong> <span id="event-end"></span></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="close-modal">Fechar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', async function() {
+      var calendarEl = document.getElementById('calendar');
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'pt-br',
+        
+        eventClick: function(info) {
+          document.getElementById('event-title').innerText = info.event.title.split(" - ")[1];
+          document.getElementById('event-description').innerText = info.event.title.split(" - ")[0]; // Atividade Macro
+          document.getElementById('event-colaborador').innerText = info.event.title.split(" - ")[2]; // Colaborador
+          document.getElementById('event-projeto').innerText = info.event.title.split(" - ")[3]; // Projeto
+          
+          var startDate = new Date(info.event.start);
+          var endDate = info.event.end ? new Date(info.event.end) : null;
+          
+          document.getElementById('event-start').innerText = startDate.toLocaleDateString();
+          document.getElementById('event-end').innerText = endDate ? endDate.toLocaleDateString() : 'N/A';
+          
+          $('#event-details').modal('show');
+        }
+      });
+      
+      var response = await fetch('/CalendarMF');
+      var data = await response.json();
+      
+      var events = data.map(function(event) {
+        return {
+          title: event.title + " - " + event.pai + " - " + event.colaborador + " - " + event.projeto,
+          start: event.start,
+          end: event.end,
+          description: event.description 
+        };
+      });
+      
+      calendar.setOption('events', events);
+      
+      calendar.render();
+    });
+
+    document.getElementById('close-modal').addEventListener('click', function() {
+      $('#event-details').modal('hide');
+    });
+
+    document.querySelector('.close').addEventListener('click', function() {
+      $('#event-details').modal('hide');
+    });
+    </script>
+
+  </div>
+</main>
+{% endblock content %}
