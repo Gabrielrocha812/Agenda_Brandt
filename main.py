@@ -141,5 +141,33 @@ async def powerbi_hubs(
         },
     )
 
+@app.get("/Calendario/{hub}")
+async def calendario_hubs(
+    request: Request,
+    hub: str,
+):
+    mapa_models = {
+        "Arq": ("CalendarioArq", "./Arqueologia/calendario.html"),
+        "Bio": ("CalendarioBio", "./Biodiversidade/calendario.html"),
+        "Esp": ("CalendarioEsp", "./Espeleologia/calendario.html"),
+        "Geo": ("CalendarioGeo", "./Geo/calendario.html"),
+        "Hum": ("CalendarioHum", "./Humanidades/calendario.html"),
+        "MF": ("CalendarioMF", "./MeioFisico/calendario.html"),
+        "Mod": ("CalendarioMod", "./Modelagens/calendario.html"),
+    }
+
+    model, caminho = mapa_models.get(hub, (None, None))
+
+    if not model or not caminho:
+        return {"error": f"O hub '{hub}' não é válido."}
+
+    return templates.TemplateResponse(
+        caminho,
+        {
+            "config": config,
+            "request": request,
+        },
+    )
+
 
 #fim endpoints agenda
