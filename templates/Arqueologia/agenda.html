@@ -10,7 +10,7 @@
   <h1 class="fw-300 mB-5 ">Demandas Agenda</h1>
 </div>
 <div class="col-lg-9">
-  <a href="/CadArqNaoProgramadas" class="btn btn-info mb-1  p-2 mr-5">Cadastrar</a>
+  <a href="/CadNaoProgramadas/Arq" class="btn btn-info mb-1  p-2 mr-5">Cadastrar</a>
 </div>
 <main class=' bgc-grey-100'>
   
@@ -86,7 +86,7 @@
           {% endif %}</td>
         <td>
               <div class="d-flex col-lg-3">
-              <a href="edit_arq_agenda/{{rs.id}}" class="td-n mr-3"><i class="ti-pencil"></i></a>
+              <a href="/edit_agenda/Arq/{{rs.id}}" class="td-n mr-3"><i class="ti-pencil"></i></a>
               <a href="/delete/Arq/{{rs.id}}" class="td-n" onclick="return confirmDelete('{{rs.atividade}}')"><i class="fa-solid fa-trash"></i></a>
             </div>
             </td>
