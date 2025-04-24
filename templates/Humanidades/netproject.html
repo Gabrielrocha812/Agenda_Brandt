@@ -10,7 +10,7 @@
 </div>
 <main class=' bgc-grey-100'>
   
-  <form action="/HumNetproject" method="get" onsubmit="saveFilters()">
+  <form action="/Netproject/Hum" method="get" onsubmit="saveFilters()">
     <div class="col-lg-6 d-flex mb-3">
     <label for="data_inicio ">Data Inicial:</label>
     <input type="date" name="data_inicio"id="data_inicio" class="col-lg-3 form-control ml-1">
@@ -55,7 +55,7 @@
             {% else %}
               {{ rs.flg_status_projeto_raiz }}
             {% endif %}</td>
-            <td><a href="edit_hum/{{rs.id}}" class="td-n ml-4 "><i class="fa-solid fa-plus"></i></a></td>
+            <td><a href="/edit/Hum/{{rs.id}}" class="td-n ml-4 "><i class="fa-solid fa-plus"></i></a></td>
         </tr>
         {% endfor %}
     </tbody>

@@ -427,4 +427,27 @@ async def add_nao_programadas(
 
     return RedirectResponse(url=f"/Agenda/{hub}", status_code=status.HTTP_303_SEE_OTHER)
 
+@app.get("/Aquisicao/{hub}")
+async def aquisicao(
+    request: Request,
+    hub: str,
+    db: Session = Depends(get_db),
+):
+    model_name, template_path = hubs.mapa_aquisicao.get(hub, (None, None))
+
+    if not model_name or not template_path:
+        raise HTTPException(status_code=400, detail=f"Hub '{hub}' não é válido.")
+
+    model_class = getattr(models, model_name, None)
+    if not model_class:
+        raise HTTPException(status_code=400, detail=f"Modelo '{model_name}' não encontrado.")
+
+    dados = db.query(model_class).all()
+
+    return templates.TemplateResponse(template_path, {
+        "request": request,
+        "config": config,
+        "data": dados
+    })
+
 #fim endpoints agenda
