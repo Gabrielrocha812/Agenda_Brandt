@@ -1,4 +1,5 @@
-from fastapi import  Depends, FastAPI, Form, Query, Request
+import logging
+from fastapi import  Depends, FastAPI, Form, HTTPException, Query, Request
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -73,6 +74,28 @@ def get_redirect_url(username: str) -> str:
     }
 
     return user_routes.get(username.lower(), "Info")
+
+async def get_Demandas(
+    request: Request,
+    hub: str,
+    db: Session = Depends(get_db),
+):
+    mapa_models = {
+        "Arq": models.Demandas_Arqueologia,
+        "Bio": models.Demandas_Biodiversidade,
+        "Esp": models.Demandas_Espeleologia,
+        "Geo": models.Demandas_Geo,
+        "Hum": models.Demandas_Humanidades,
+        "MF": models.Demandas_MeioFisico,
+        "Mod": models.Demandas_Modelagens,
+        "Ges": models.Demandas_Gestao,
+    }
+
+    model_class = mapa_models.get(hub)
+    if not model_class:
+        raise HTTPException(status_code=400, detail=f"Hub '{hub}' não encontrado.")
+
+    return db.query(model_class).all()
 
 #Fim Funções
 
@@ -252,6 +275,122 @@ async def agenda_hubs(
             "config": config,
             "request": request,
             "data": data,
+        },
+    )
+
+@app.get("/Netproject/{hub}")
+async def netproject_hubs(
+    request: Request,
+    hub: str,
+    db: Session = Depends(get_db),
+    data_inicio: Optional[str] = Query(None),
+    data_fim: Optional[str] = Query(None),
+):
+    mapa_models = {
+        "Arq": (models.hora_real_arqueologia, "./Arqueologia/netproject.html"),
+        "Bio": (models.hora_real_biodiversidade, "./Biodiversidade/netproject.html"),
+        "Esp": (models.hora_real_espeleologia, "./Espeleologia/netproject.html"),
+        "Geo": (models.hora_real_geo, "./Geo/netproject.html"),
+        "Hum": (models.hora_real_humanidades, "./Humanidades/netproject.html"),
+        "MF": (models.hora_real_mfisico, "./MeioFisico/netproject.html"),
+        "Mod": (models.hora_real_mmodelagens, "./Modelagens/netproject.html"),
+    }
+
+    model_class, caminho_template = mapa_models.get(hub, (None, None))
+
+    if not model_class or not caminho_template:
+        return {"error": f"O hub '{hub}' não é válido."}
+
+    # Conversão de datas
+    try:
+        data_inicio_dt = datetime.strptime(data_inicio, "%Y-%m-%d") if data_inicio else None
+        data_fim_dt = datetime.strptime(data_fim, "%Y-%m-%d") if data_fim else None
+    except ValueError as e:
+        logging.error(f"Erro ao converter datas: {e}")
+        return {"error": "Formato de data inválido. Use YYYY-MM-DD."}
+
+    # Consulta e filtros
+    query = db.query(model_class)
+    if data_inicio_dt and data_fim_dt:
+        query = query.filter(
+            model_class.dth_inicio >= data_inicio_dt,
+            model_class.dth_prevista <= data_fim_dt
+        )
+    elif data_inicio_dt:
+        query = query.filter(model_class.dth_inicio >= data_inicio_dt)
+    elif data_fim_dt:
+        query = query.filter(model_class.dth_prevista <= data_fim_dt)
+
+    demanda = query.all()
+
+    # Formatando datas
+    for item in demanda:
+        item.dth_inicio = item.dth_inicio.strftime("%d-%m-%Y") if item.dth_inicio else None
+        item.dth_prevista = item.dth_prevista.strftime("%d-%m-%Y") if item.dth_prevista else None
+
+    # Usando função genérica para comparação
+    data_calendar = await get_Demandas(request=request, hub=hub, db=db)
+
+    ids_calendar = {(item.cod_projeto, item.responsavel) for item in data_calendar}
+    ids_another = {(item.cod_projeto, item.nom_usuario) for item in demanda}
+
+    differences_ids = ids_another - ids_calendar
+
+    data = [
+        item for item in demanda if (item.cod_projeto, item.nom_usuario) in differences_ids
+    ]
+
+    return templates.TemplateResponse(
+        caminho_template,
+        {
+            "config": config,
+            "request": request,
+            "data": list(data),
+        },
+    )
+
+@app.get("/Aquisicao/{hub}")
+async def aquisicao_hubs(
+    request: Request,
+    hub: str,
+    db: Session = Depends(get_db),
+):
+    mapa_models = {
+        "Arq": ("AquisicaoArq", "./Arqueologia/aquisicao.html"),
+        "ArqGe": ("AquisicaoArq", "./Gerencia/Arqueologia/aquisicao.html"),
+        "Bio": ("AquisicaoBio", "./Biodiversidade/aquisicao.html"),
+        "BioGe": ("AquisicaoBio", "./Gerencia/Biodiversidade/aquisicao.html"),
+        "Esp": ("AquisicaoEsp", "./Espeleologia/aquisicao.html"),
+        "EspGe": ("AquisicaoEsp", "./Gerencia/Espeleologia/aquisicao.html"),
+        "Geo": ("AquisicaoGeo", "./Geo/aquisicao.html"),
+        "GeoGe": ("AquisicaoGeo", "./Gerencia/Geo/aquisicao.html"),
+        "Hum": ("AquisicaoHum", "./Humanidades/aquisicao.html"),
+        "HumGe": ("AquisicaoHum", "./Gerencia/Humanidades/aquisicao.html"),
+        "MF": ("AquisicaoMF", "./MeioFisico/aquisicao.html"),
+        "MFGe": ("AquisicaoMF", "./Gerencia/MeioFisico/aquisicao.html"),
+        "Mod": ("AquisicaoMod", "./Modelagens/aquisicao.html"),
+        "ModGe": ("AquisicaoMod", "./Gerencia/Modelagens/aquisicao.html"),
+    }
+
+    model, caminho = mapa_models.get(hub, (None, None))
+
+    if not model or not caminho:
+        return {"error": f"O hub '{hub}' não é válido."}
+
+    ModelClass = getattr(models, model, None)
+
+    if ModelClass is None:
+        return {"error": f"O modelo '{model}' não foi encontrado."}
+
+    query = db.query(ModelClass)
+    demanda = query.all()
+
+    return templates.TemplateResponse(
+        caminho,
+        {
+            "config": config,
+            "request": request,
+            "data": demanda,
         },
     )
 
