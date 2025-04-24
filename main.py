@@ -1,9 +1,15 @@
-from fastapi import  FastAPI, Form, Request
+from fastapi import  Depends, FastAPI, Form, Query, Request
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from sqlalchemy.orm import Session, joinedload
 from ldap3 import Server, Connection, NTLM, ALL
 from Crypto.Hash import MD4
+from typing import Optional
+from database.database import SessionLocal
+from datetime import date, datetime
+
+import models
 import hashlib
 
 #Inicio Padroes FastAPI
@@ -20,6 +26,15 @@ LDAP_DOMAIN = "brandt.local"
 LDAP_BASE_DN = "dc=brandt,dc=local"
 
 #Fim Padroes FastAPI
+
+#Banco inicio
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+#Banco FIm
 
 #Inicio Funções
 
@@ -45,7 +60,7 @@ def authenticate_with_ad(username: str, password: str):
 
 def get_redirect_url(username: str) -> str:
     user_routes = {
-        "gabriel.rocha" : "MeM",
+        "gabriel.rocha" : "Arq",
         "vleite" : "Arq",
         "rodrigo.pessoa" : "Bio",
         "tlima" : "Esp",
@@ -169,5 +184,75 @@ async def calendario_hubs(
         },
     )
 
+@app.get("/Agenda/{hub}")
+async def agenda_hubs(
+    request: Request,
+    hub: str,
+    db: Session = Depends(get_db),
+    data_inicio: Optional[str] = Query(None),
+    data_fim: Optional[str] = Query(None),
+):
+    mapa_models = {
+        "Arq": (models.Demandas_Arqueologia, "./Arqueologia/agenda.html"),
+        "Bio": (models.Demandas_Biodiversidade, "./Biodiversidade/agenda.html"),
+        "Esp": (models.Demandas_Espeleologia, "./Espeleologia/agenda.html"),
+        "Geo": (models.Demandas_Geo, "./Geo/agenda.html"),
+        "Hum": (models.Demandas_Humanidades, "./Humanidades/agenda.html"),
+        "MF": (models.Demandas_MeioFisico, "./MeioFisico/agenda.html"),
+        "Mod": (models.Demandas_Modelagens, "./Modelagens/agenda.html"),
+    }
+
+    model_class, caminho_template = mapa_models.get(hub, (None, None))
+
+    if not model_class or not caminho_template:
+        return {"error": f"O hub '{hub}' não é válido."}
+
+    query = db.query(model_class).options(joinedload(model_class.hora_real_usuario))
+
+    if data_inicio:
+        data_inicio_dt = datetime.strptime(data_inicio, "%Y-%m-%d")
+        query = query.filter(model_class.dth_fim >= data_inicio_dt)
+
+    if data_fim:
+        data_fim_dt = datetime.strptime(data_fim, "%Y-%m-%d")
+        query = query.filter(model_class.dth_inicio <= data_fim_dt)
+
+    demandas = query.all()
+
+    data = []
+    for demanda in demandas:
+        horas_data = [
+            {
+                "pai": hora.pai,
+                "total_horas_alocadas": hora.total_horas_alocadas,
+                "nom_projeto": hora.nom_projeto,
+                "nom_usuario": hora.nom_usuario,
+                "dth_inicio": hora.dth_inicio.strftime("%d-%m-%Y") if hora.dth_inicio else None,
+                "dth_prevista": hora.dth_prevista.strftime("%d-%m-%Y") if hora.dth_prevista else None,
+            }
+            for hora in demanda.hora_real_usuario
+        ]
+
+        data.append({
+            "id": demanda.id,
+            "titulo": demanda.titulo,
+            "hub": demanda.hub,
+            "responsavel": demanda.responsavel,
+            "projeto": demanda.projeto,
+            "atividade": demanda.atividade,
+            "status": demanda.status,
+            "dth_inicio": demanda.dth_inicio.strftime("%d-%m-%Y") if demanda.dth_inicio else None,
+            "dth_fim": demanda.dth_fim.strftime("%d-%m-%Y") if demanda.dth_fim else None,
+            "hora_real_usuario": horas_data,
+        })
+
+    return templates.TemplateResponse(
+        caminho_template,
+        {
+            "config": config,
+            "request": request,
+            "data": data,
+        },
+    )
 
 #fim endpoints agenda
