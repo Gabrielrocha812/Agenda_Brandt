@@ -49,7 +49,14 @@ mapa_templates = {
         "edit_simples": "./Arqueologia/edit.html",
     },
     "ArqGe": {
+        "agenda": "./Gerencia/Arqueologia/agenda.html",
+        "edit": "./Gerencia/Arqueologia/edit_agenda.html",
+        "netproject": "./Gerencia/Arqueologia/netproject.html",
+        "naoprogramadas": "./Gerencia/Arqueologia/naoprogramadas.html",
+        "calendario": "./Gerencia/Arqueologia/calendario.html",
+        "powerbi": "./Gerencia/Arqueologia/PowerBi.html",
         "index": "./Gerencia/Arqueologia/index.html",
+        "edit_simples": "./Gerencia/Arqueologia/edit.html",
     },
     "Bio": {
         "agenda": "./Biodiversidade/agenda.html",
@@ -62,7 +69,14 @@ mapa_templates = {
         "edit_simples": "./Biodiversidade/edit.html",
     },
     "BioGe": {
+        "agenda": "./Gerencia/Biodiversidade/agenda.html",
+        "edit": "./Gerencia/Biodiversidade/edit_agenda.html",
+        "netproject": "./Gerencia/Biodiversidade/netproject.html",
+        "naoprogramadas": "./Gerencia/Biodiversidade/naoprogramadas.html",
+        "calendario": "./Gerencia/Biodiversidade/calendario.html",
+        "powerbi": "./Gerencia/Biodiversidade/PowerBi.html",
         "index": "./Gerencia/Biodiversidade/index.html",
+        "edit_simples": "./Gerencia/Biodiversidade/edit.html",
     },
     "Esp": {
         "agenda": "./Espeleologia/agenda.html",
@@ -75,7 +89,14 @@ mapa_templates = {
         "edit_simples": "./Espeleologia/edit.html",
     },
     "EspGe": {
+        "agenda": "./Gerencia/Espeleologia/agenda.html",
+        "edit": "./Gerencia/Espeleologia/edit_agenda.html",
+        "netproject": "./Gerencia/Espeleologia/netproject.html",
+        "naoprogramadas": "./Gerencia/Espeleologia/naoprogramadas.html",
+        "calendario": "./Gerencia/Espeleologia/calendario.html",
+        "powerbi": "./Gerencia/Espeleologia/PowerBi.html",
         "index": "./Gerencia/Espeleologia/index.html",
+        "edit_simples": "./Gerencia/Espeleologia/edit.html",
     },
     "Geo": {
         "agenda": "./Geo/agenda.html",
@@ -88,7 +109,14 @@ mapa_templates = {
         "edit_simples": "./Geo/edit.html",
     },
     "GeoGe": {
+        "agenda": "./Gerencia/Geo/agenda.html",
+        "edit": "./Gerencia/Geo/edit_agenda.html",
+        "netproject": "./Gerencia/Geo/netproject.html",
+        "naoprogramadas": "./Gerencia/Geo/naoprogramadas.html",
+        "calendario": "./Gerencia/Geo/calendario.html",
+        "powerbi": "./Gerencia/Geo/PowerBi.html",
         "index": "./Gerencia/Geo/index.html",
+        "edit_simples": "./Gerencia/Geo/edit.html",
     },
     "Hum": {
         "agenda": "./Humanidades/agenda.html",
@@ -101,7 +129,14 @@ mapa_templates = {
         "edit_simples": "./Humanidades/edit.html",
     },
     "HumGe": {
+        "agenda": "./Gerencia/Humanidades/agenda.html",
+        "edit": "./Gerencia/Humanidades/edit_agenda.html",
+        "netproject": "./Gerencia/Humanidades/netproject.html",
+        "naoprogramadas": "./Gerencia/Humanidades/naoprogramadas.html",
+        "calendario": "./Gerencia/Humanidades/calendario.html",
+        "powerbi": "./Gerencia/Humanidades/PowerBi.html",
         "index": "./Gerencia/Humanidades/index.html",
+        "edit_simples": "./Gerencia/Humanidades/edit.html",
     },
     "MF": {
         "agenda": "./MeioFisico/agenda.html",
@@ -114,7 +149,14 @@ mapa_templates = {
         "edit_simples": "./MeioFisico/edit.html",
     },
     "MFGe": {
+        "agenda": "./Gerencia/MeioFisico/agenda.html",
+        "edit": "./Gerencia/MeioFisico/edit_agenda.html",
+        "netproject": "./Gerencia/MeioFisico/netproject.html",
+        "naoprogramadas": "./Gerencia/MeioFisico/naoprogramadas.html",
+        "calendario": "./Gerencia/MeioFisico/calendario.html",
+        "powerbi": "./Gerencia/MeioFisico/PowerBi.html",
         "index": "./Gerencia/MeioFisico/index.html",
+        "edit_simples": "./Gerencia/MeioFisico/edit.html",
     },
     "Mod": {
         "agenda": "./Modelagens/agenda.html",
@@ -127,7 +169,14 @@ mapa_templates = {
         "edit_simples": "./Modelagens/edit.html",
     },
     "ModGe": {
+        "agenda": "./Gerencia/Modelagens/agenda.html",
+        "edit": "./Gerencia/Modelagens/edit_agenda.html",
+        "netproject": "./Gerencia/Modelagens/netproject.html",
+        "naoprogramadas": "./Gerencia/Modelagens/naoprogramadas.html",
+        "calendario": "./Gerencia/Modelagens/calendario.html",
+        "powerbi": "./Gerencia/Modelagens/PowerBi.html",
         "index": "./Gerencia/Modelagens/index.html",
+        "edit_simples": "./Gerencia/Modelagens/edit.html",
     },
     "Gerencia": {
         "index": "./Gerencia/index.html",

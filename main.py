@@ -80,21 +80,9 @@ async def get_Demandas(
     hub: str,
     db: Session = Depends(get_db),
 ):
-    mapa_models = {
-        "Arq": models.Demandas_Arqueologia,
-        "Bio": models.Demandas_Biodiversidade,
-        "Esp": models.Demandas_Espeleologia,
-        "Geo": models.Demandas_Geo,
-        "Hum": models.Demandas_Humanidades,
-        "MF": models.Demandas_MeioFisico,
-        "Mod": models.Demandas_Modelagens,
-        "Ges": models.Demandas_Gestao,
-    }
-
-    model_class = mapa_models.get(hub)
+    model_class = hubs.get_model_demanda_by_hub(hub)
     if not model_class:
         raise HTTPException(status_code=400, detail=f"Hub '{hub}' não encontrado.")
-
     return db.query(model_class).all()
 
 #Fim Funções
