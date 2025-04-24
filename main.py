@@ -1,6 +1,6 @@
 import logging
 from fastapi import  Depends, FastAPI, Form, HTTPException, Query, Request
-from fastapi.responses import RedirectResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session, joinedload
@@ -9,7 +9,7 @@ from Crypto.Hash import MD4
 from typing import Optional
 from database.database import SessionLocal
 from datetime import date, datetime
-
+from starlette import status
 import models
 import hashlib
 
@@ -392,6 +392,131 @@ async def aquisicao_hubs(
             "request": request,
             "data": demanda,
         },
+    )
+
+@app.get("/edit/{hub}/{id}")
+async def edit_demanda(
+    request: Request,
+    hub: str,
+    id: int,
+    db: Session = Depends(get_db)
+):
+    mapa_models = {
+        "Arq": (models.hora_real_arqueologia, "./Arqueologia/edit.html"),
+        "Bio": (models.hora_real_biodiversidade, "./Biodiversidade/edit.html"),
+        "Esp": (models.hora_real_espeleologia, "./Espeleologia/edit.html"),
+        "Geo": (models.hora_real_geo, "./Geo/edit.html"),
+        "Hum": (models.hora_real_humanidades, "./Humanidades/edit.html"),
+        "MF": (models.hora_real_mfisico, "./MeioFisico/edit.html"),
+        "Mod": (models.hora_real_mmodelagens, "./Modelagens/edit.html"),
+    }
+
+    model_class, template_path = mapa_models.get(hub, (None, None))
+    if not model_class or not template_path:
+        raise HTTPException(status_code=400, detail=f"Hub '{hub}' não é válido.")
+
+    projeto = db.query(model_class).filter(model_class.id == id).first()
+    if not projeto:
+        raise HTTPException(status_code=404, detail="Demanda não encontrada.")
+
+    return templates.TemplateResponse(
+        template_path,
+        {
+            "request": request,
+            "demanda": projeto,
+            "config": config
+        },
+    )
+
+@app.post("/add/{hub}")
+async def add_demanda(
+    request: Request,
+    hub: str,
+    status_projeto: str = Form(...),
+    horas: str = Form(...),
+    horasNP: str = Form(...),
+    dth_fim: date = Form(...),
+    dth_inicio: date = Form(...),
+    dtfimnp: date = Form(...),
+    cod_projeto: int = Form(...),
+    atividade: str = Form(...),
+    titulo: str = Form(...),
+    responsavel: str = Form(...),
+    projeto: str = Form(...),
+    dtinicionp: date = Form(...),
+    hub_banco: str = Form(...),
+    db: Session = Depends(get_db),
+):
+    mapa_models = {
+        "Arq": models.Demandas_Arqueologia,
+        "Bio": models.Demandas_Biodiversidade,
+        "Esp": models.Demandas_Espeleologia,
+        "Geo": models.Demandas_Geo,
+        "Hum": models.Demandas_Humanidades,
+        "MF": models.Demandas_MeioFisico,
+        "Mod": models.Demandas_Modelagens,
+    }
+
+    model_class = mapa_models.get(hub)
+    if not model_class:
+        raise HTTPException(status_code=400, detail=f"Hub '{hub}' não é válido.")
+
+    nova_demanda = model_class(
+        horas_np=horasNP,
+        status=status_projeto,
+        n_hora_hub=horas,
+        dth_fim=dth_fim,
+        dth_inicio=dth_inicio,
+        dtfimnp=dtfimnp,
+        hub=hub_banco,
+        titulo=titulo,
+        responsavel=responsavel,
+        projeto=projeto,
+        dtinicionp=dtinicionp,
+        atividade=atividade,
+        cod_projeto=cod_projeto,
+    )
+
+    db.add(nova_demanda)
+    db.commit()
+
+    return RedirectResponse(
+        url=f"/Netproject/{hub}",
+    status_code=status.HTTP_303_SEE_OTHER
+)
+
+@app.get("/delete/{hub}/{id}")
+async def delete_demanda(
+    request: Request,
+    hub: str,
+    id: int,
+    db: Session = Depends(get_db),
+):
+    mapa_models = {
+        "Arq": models.Demandas_Arqueologia,
+        "Bio": models.Demandas_Biodiversidade,
+        "Esp": models.Demandas_Espeleologia,
+        "Geo": models.Demandas_Geo,
+        "Hum": models.Demandas_Humanidades,
+        "MF": models.Demandas_MeioFisico,
+        "Mod": models.Demandas_Modelagens,
+    }
+
+    model_class = mapa_models.get(hub)
+    if not model_class:
+        raise HTTPException(status_code=400, detail=f"Hub '{hub}' não é válido.")
+
+    demanda = db.query(model_class).filter(model_class.id == id).first()
+
+    if not demanda:
+        raise HTTPException(status_code=404, detail="Demanda não encontrada.")
+
+    db.delete(demanda)
+    db.commit()
+
+    return RedirectResponse(
+        url=f"/Agenda/{hub}",
+        status_code=status.HTTP_303_SEE_OTHER
     )
 
 #fim endpoints agenda
