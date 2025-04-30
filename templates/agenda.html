@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+
+  <!-- Cabeçalho -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h4 fw-semibold mb-0">Agenda - {{ hub_name }}</h1>
+    <a href="/CadNaoProgramadas/{{ hub_name | capitalize }}" class="btn btn-primary">
+      <i class="bi bi-plus-lg me-1"></i> Cadastrar
+    </a>
+  </div>
+
+  <!-- Filtros -->
+  <form method="get" class="row g-3 mb-4 align-items-end" onsubmit="saveFilters()">
+    <div class="col-md-3">
+      <label for="data_inicio" class="form-label">Data Inicial</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-calendar-date"></i></span>
+        <input type="date" name="data_inicio" id="data_inicio" class="form-control">
+      </div>
+    </div>
+    <div class="col-md-3">
+      <label for="data_fim" class="form-label">Data Final</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-calendar-date"></i></span>
+        <input type="date" name="data_fim" id="data_fim" class="form-control">
+      </div>
+    </div>
+    <div class="col-md-auto">
+      <button type="submit" class="btn btn-outline-secondary">
+        <i class="bi bi-funnel-fill me-1"></i> Filtrar
+      </button>
+    </div>
+  </form>
+
+  <!-- Tabela -->
+  <div class="table-responsive bg-white shadow-sm rounded p-2">
+    <table id="tabela" class="table table-hover table-bordered align-middle mb-0">
+      <thead class="table-light text-secondary small">
+        <tr>
+          <th>Projeto</th>
+          <th>Atividade Macro</th>
+          <th>Atividade</th>
+          <th>Responsável</th>
+          <th>Status</th>
+          <th>Início Real</th>
+          <th>Fim Real</th>
+          <th>Início NP</th>
+          <th>Fim NP</th>
+          <th class="text-center">Ação</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for rs in data %}
+        <tr>
+          <td>{{ rs.projeto }}</td>
+          <td>{{ rs.titulo }}</td>
+          <td>{{ rs.atividade }}</td>
+          <td>{{ rs.responsavel }}</td>
+          <td>
+            <span class="badge {% if rs.status == 'Concluído' %}bg-primary
+                                {% elif 'Execução' in rs.status %}bg-success
+                                {% else %}bg-warning text-dark{% endif %}">
+              {{ rs.status }}
+            </span>
+          </td>
+          <td>{{ rs.dth_inicio }}</td>
+          <td>{{ rs.dth_fim }}</td>
+          <td>{{ rs.dtinicionp }}</td>
+          <td>{{ rs.dtfimnp }}</td>
+          <td class="text-center">
+            <div class="d-flex justify-content-center gap-2">
+              <a href="/edit/{{ hub_name }}/{{ rs.id }}" class="btn btn-sm btn-outline-primary" title="Editar" data-bs-toggle="tooltip">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <a href="/deletar/{{ hub_name }}/{{ rs.id }}" onclick="return confirm('Deseja excluir {{ rs.atividade }}?')"
+                 class="btn btn-sm btn-outline-danger" title="Excluir" data-bs-toggle="tooltip">
+                <i class="bi bi-trash"></i>
+              </a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+  // Tooltips
+  document.addEventListener('DOMContentLoaded', () => {
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(t => new bootstrap.Tooltip(t));
+  });
+
+  // Filtros salvos
+  function saveFilters() {
+    const dataInicio = document.getElementById('data_inicio').value;
+    const dataFim = document.getElementById('data_fim').value;
+    localStorage.setItem('data_inicio', dataInicio);
+    localStorage.setItem('data_fim', dataFim);
+  }
+
+  function loadFilters() {
+    const dataInicio = localStorage.getItem('data_inicio');
+    const dataFim = localStorage.getItem('data_fim');
+    const params = new URLSearchParams(window.location.search);
+
+    if ((!params.has('data_inicio') && dataInicio) || (!params.has('data_fim') && dataFim)) {
+      if (dataInicio) params.set('data_inicio', dataInicio);
+      if (dataFim) params.set('data_fim', dataFim);
+      const newUrl = `${window.location.pathname}?${params.toString()}`;
+      window.location.replace(newUrl);
+    } else {
+      if (dataInicio) document.getElementById('data_inicio').value = dataInicio;
+      if (dataFim) document.getElementById('data_fim').value = dataFim;
+    }
+  }
+
+  window.onload = loadFilters;
+
+  // DataTables
+  new DataTable('#tabela', {
+    language: {
+      url: "https://cdn.datatables.net/plug-ins/1.11.3/i18n/pt_br.json"
+    },
+    dom: "<'row mb-3'<'col-md-6 d-flex align-items-center gap-2'B><'col-md-6 text-end'f>>" +
+         "<'row mb-2'<'col-md-6'l><'col-md-6 text-end'>>" +
+         "t" +
+         "<'row mt-3'<'col-md-6'i><'col-md-6 text-end'p>>",
+    buttons: [
+      {
+        extend: 'excelHtml5',
+        text: '<i class="bi bi-file-earmark-excel me-1"></i> Exportar Excel',
+        className: 'btn btn-secondary btn-sm',
+        exportOptions: {
+          modifier: { page: 'current' }
+        },
+        filename: 'Agenda_{{ hub_name }}',
+        title: null
+      }
+    ],
+    pageLength: 10,
+    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]]
+  });
+</script>
+
+{% endblock %}

@@ -1,0 +1,23 @@
+<div class="d-flex flex-column p-3 vh-100 bg-white border-end" style="width: 240px;">
+  <!-- Logo + título -->
+  <a href="/" class="d-flex align-items-center mb-4 text-decoration-none">
+    <img src="/static/assets/images/logo_brandt.png" alt="Logo" width="32" class="me-2">
+    <span class="fs-5 fw-semibold text-dark">Brandt Meio Ambiente</span>
+  </a>
+
+  <!-- Menu -->
+  <ul class="nav nav-pills flex-column gap-2">
+    {% for item in sidebar_items %}
+      <li class="nav-item">
+        <a href="{{ item.href }}" class="nav-link d-flex align-items-center text-dark {% if request.url.path == item.href %}active bg-primary text-white{% endif %}">
+          <i class="{{ item.icon }} me-2"></i> {{ item.name }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <!-- Rodapé opcional -->
+  <div class="mt-auto pt-4 small text-muted">
+    <span>&copy; 2025 Brandt</span>
+  </div>
+</div>

@@ -203,6 +203,21 @@ mapa_aquisicao = {
     "ModGe": ("AquisicaoMod", "./Gerencia/Modelagens/aquisicao.html"),
 }
 
+# Nomes legíveis base
+nomes_hub_legivel_base = {
+    "Arq": "Arqueologia",
+    "Bio": "Biodiversidade",
+    "Esp": "Espeleologia",
+    "Geo": "Geociências",
+    "Hum": "Humanidades",
+    "MF": "Meio Físico",
+    "Mod": "Modelagens",
+    "MeM": "Meio e Monitoramento",
+    "Gerencia": "Gerência"
+}
+
+
+
 # Helpers utilitários
 
 def get_model_demanda_by_hub(hub: str):
@@ -213,3 +228,11 @@ def get_model_hora_real_by_hub(hub: str):
 
 def get_templates_by_hub(hub: str):
     return mapa_templates.get(hub, {})
+
+# Função de nome legível
+def get_nome_legivel(hub: str) -> str:
+    if hub.endswith("Ge"):
+        base = hub[:-2]  # Remove "Ge"
+        nome_base = nomes_hub_legivel_base.get(base, base)
+        return f"{nome_base} Gerência"
+    return nomes_hub_legivel_base.get(hub, hub)

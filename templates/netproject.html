@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+
+  <!-- Título e botão -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h4 fw-semibold">Demandas Netproject - {{ hub_name }}</h1>
+    <!-- Se houver botão de criar/cadastrar, adicione aqui -->
+  </div>
+
+  <!-- Filtros -->
+  <form method="get" class="row g-3 mb-4 align-items-end" onsubmit="saveFilters()">
+    <div class="col-md-3">
+      <label for="data_inicio" class="form-label">Data Inicial</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-calendar-date"></i></span>
+        <input type="date" name="data_inicio" id="data_inicio" class="form-control" />
+      </div>
+    </div>
+    <div class="col-md-3">
+      <label for="data_fim" class="form-label">Data Final</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-calendar-date"></i></span>
+        <input type="date" name="data_fim" id="data_fim" class="form-control" />
+      </div>
+    </div>
+    <div class="col-md-auto">
+      <button type="submit" class="btn btn-outline-secondary">
+        <i class="bi bi-funnel-fill me-1"></i> Filtrar
+      </button>
+    </div>
+  </form>
+
+  <!-- Tabela -->
+  <div class="table-responsive bg-white shadow-sm rounded p-2">
+    <table class="table table-hover table-bordered align-middle mb-0" id="tabela">
+      <thead class="table-light text-secondary small">
+        <tr>
+          <th>Projeto</th>
+          <th>Atividade Macro</th>
+          <th>Atividade</th>
+          <th>Colaborador Responsável</th>
+          <th>Data Início NP</th>
+          <th>Data Fim NP</th>
+          <th>Horas NP</th>
+          <th>Status NP</th>
+          <th class="text-center">Ação</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for rs in data %}
+        <tr>
+          <td>{{ rs.cod_projeto_alfa }}</td>
+          <td>{{ rs.pai }}</td>
+          <td>{{ rs.nom_projeto }}</td>
+          <td>{{ rs.nom_usuario }}</td>
+          <td>{{ rs.dth_inicio }}</td>
+          <td>{{ rs.dth_prevista }}</td>
+          <td>{{ '%.2f'|format(rs.total_horas_alocadas) }}</td>
+          <td>
+            {% set status = rs.flg_status_projeto_raiz %}
+            <span class="badge
+              {% if status == '2' %} bg-success
+              {% elif status == '1' %} bg-secondary
+              {% elif status == '3' %} bg-info text-dark
+              {% elif status == '6' %} bg-warning text-dark
+              {% else %} bg-light text-muted {% endif %}">
+              {% if status == '2' %}Em execução
+              {% elif status == '1' %}Aguardando execução
+              {% elif status == '3' %}Aguardando aceite
+              {% elif status == '6' %}Paralisado
+              {% else %}{{ status }}{% endif %}
+            </span>
+          </td>
+          <td class="text-center">
+            <a href="/edit/{{ hub_name }}/{{ rs.id }}" class="btn btn-sm btn-outline-success" title="Adicionar ao Agenda" data-bs-toggle="tooltip">
+              <i class="bi bi-plus-lg"></i>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Ativa tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Carrega filtros salvos
+    loadFilters();
+
+    // Inicia DataTables
+    $("#tabela").DataTable({
+  language: {
+    url: "https://cdn.datatables.net/plug-ins/1.11.3/i18n/pt_br.json"
+  },
+  dom: "<'row mb-3'<'col-md-6 d-flex align-items-center gap-2'B><'col-md-6 text-end'f>>" +
+       "<'row mb-2'<'col-md-6'l><'col-md-6 text-end'>>" +
+       "t" +
+       "<'row mt-3'<'col-md-6'i><'col-md-6 text-end'p>>",
+  buttons: [
+    {
+      extend: 'excelHtml5',
+      text: '<i class="bi bi-file-earmark-excel me-1"></i> Exportar Excel',
+      className: 'btn btn-secondary btn-sm'
+    }
+  ],
+  pageLength: 10,
+  lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]]
+});
+
+  });
+
+  function saveFilters() {
+    const dataInicio = document.getElementById('data_inicio').value;
+    const dataFim = document.getElementById('data_fim').value;
+    localStorage.setItem('data_inicio', dataInicio);
+    localStorage.setItem('data_fim', dataFim);
+  }
+
+  function loadFilters() {
+    const dataInicio = localStorage.getItem('data_inicio');
+    const dataFim = localStorage.getItem('data_fim');
+    const params = new URLSearchParams(window.location.search);
+
+    if ((!params.has('data_inicio') && dataInicio) || (!params.has('data_fim') && dataFim)) {
+      if (dataInicio) params.set('data_inicio', dataInicio);
+      if (dataFim) params.set('data_fim', dataFim);
+      window.location.replace(`${window.location.pathname}?${params.toString()}`);
+    } else {
+      if (dataInicio) document.getElementById('data_inicio').value = dataInicio;
+      if (dataFim) document.getElementById('data_fim').value = dataFim;
+    }
+  }
+</script>
+{% endblock %}

@@ -102,6 +102,7 @@ class hora_real_espeleologia(Base):
     
 class hora_real_humanidades(Base):
     __tablename__ = 'hora_real_humanidades'
+    
     id = Column(Integer, primary_key=True)
     cod_projeto = Column(String(150), ForeignKey("demandas_hum.cod_projeto"))
     pai = Column(String(150))
@@ -114,9 +115,10 @@ class hora_real_humanidades(Base):
     cod_usuario = Column(String(150))
     nom_contato = Column(String(150))
     flg_status_projeto_raiz = Column(String(150))
-    def _repr_(self):
-        return '<hora_real_humanidades %r>'%(self.id)    
-    
+
+    def __repr__(self):
+        return f'<hora_real_humanidades id={self.id}>'
+  
 class hora_real_mfisico(Base):
     __tablename__ = 'hora_real_mfisico'
     id = Column(Integer, primary_key=True)
@@ -265,6 +267,7 @@ class Demandas_Geo(Base):
        
 class Demandas_Humanidades(Base):
     __tablename__ = 'demandas_hum'
+    
     id = Column(Integer, primary_key=True)
     titulo = Column(String)
     hub = Column(String(150))
@@ -279,12 +282,6 @@ class Demandas_Humanidades(Base):
     dtinicionp = Column(Date)
     dtfimnp = Column(Date)
     cod_projeto = Column(String(150))
-
-    hora_real_usuario = relationship(
-        "hora_real_humanidades",
-        backref="demandas_hum",  # Relacionamento reverso
-        lazy="joined"
-    )
 
     def __repr__(self):
         return f'<Demandas_Humanidades id={self.id}, titulo="{self.titulo}">'
