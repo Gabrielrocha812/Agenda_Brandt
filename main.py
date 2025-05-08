@@ -221,10 +221,11 @@ async def agenda_hubs(
             "projeto": d.projeto,
             "atividade": d.atividade,
             "status": d.status,
-            "dth_inicio": d.dth_inicio.strftime("%Y-%m-%d") if d.dth_inicio else None,
-            "dth_fim": d.dth_fim.strftime("%Y-%m-%d") if d.dth_fim else None,
-            "dtinicionp": d.dtinicionp.strftime("%Y-%m-%d") if d.dtinicionp else None,
-            "dtfimnp": d.dtfimnp.strftime("%Y-%m-%d") if d.dtfimnp else None,
+            "dth_inicio": d.dth_inicio.strftime("%d/%m/%Y") if d.dth_inicio else None,
+            "dth_fim": d.dth_fim.strftime("%d/%m/%Y") if d.dth_fim else None,
+            "dtinicionp": d.dtinicionp.strftime("%d/%m/%Y") if d.dtinicionp else None,
+            "dtfimnp": d.dtfimnp.strftime("%d/%m/%Y") if d.dtfimnp else None,
+
         }
         for d in query.all()
     ]
