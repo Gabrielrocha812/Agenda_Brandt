@@ -98,6 +98,21 @@
       {% endfor %}
     </ul>
   
+      <!-- Perfil do usuário -->
+  <div class="border-top pt-3 mt-3">
+    <div class="d-flex align-items-center">
+      <div class="rounded-circle bg-primary text-white d-flex justify-content-center align-items-center me-2" style="width: 36px; height: 36px;">
+        <i class="bi bi-person"></i>
+      </div>
+      <div>
+        <div class="fw-semibold text-dark small">{{ request.session.get("username") }}</div>
+        <a href="/logout" class="text-danger small text-decoration-none">
+          <i class="bi bi-box-arrow-right me-1"></i>Sair
+        </a>
+      </div>
+    </div>
+  </div>
+  
     <!-- Rodapé -->
     <div class="mt-auto pt-4 small text-muted">
       <span>&copy; 2025 Brandt</span>

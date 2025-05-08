@@ -3,6 +3,7 @@ from fastapi import Depends, FastAPI, Form, HTTPException, Query, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from starlette.middleware.sessions import SessionMiddleware
 from sqlalchemy.orm import Session
 from ldap3 import Server, Connection, NTLM, ALL
 from Crypto.Hash import MD4
@@ -104,6 +105,7 @@ def remover_acentos(texto):
 
 # inicio endpoints de login
 
+app.add_middleware(SessionMiddleware, secret_key="brandtmeioambiente@2025")
 
 @app.get("/")
 async def login(request: Request):
@@ -121,14 +123,18 @@ async def login(request: Request):
 
 
 @app.post("/logar")
-async def logar(username: str = Form(...), password: str = Form(...)):
+async def logar(request: Request, username: str = Form(...), password: str = Form(...)):
     if authenticate_with_ad(username, password):
+        request.session["username"] = username
         redirect_url = get_redirect_url(username)
         return RedirectResponse(url=redirect_url, status_code=303)
     else:
         return RedirectResponse(url="/?error=Credenciais inválidas", status_code=303)
 
-
+@app.get("/logout")
+async def logout(request: Request):
+    request.session.clear()
+    return RedirectResponse(url="/", status_code=303)
 # fim endpoints de login
 
 
@@ -136,6 +142,10 @@ async def logar(username: str = Form(...), password: str = Form(...)):
 # Gerencia inicio
 @app.get("/Gerencia", response_class=HTMLResponse)
 async def gerencia(request: Request):
+    usuario = request.session.get("username")
+    if not usuario:
+        return RedirectResponse(url="/?error=Não autenticado", status_code=303)
+    
     return templates.TemplateResponse("Gerencia/index.html", {"request": request})
 
 
@@ -149,7 +159,11 @@ async def index_hubs(request: Request, hub: str):
         raise HTTPException(
             status_code=400, detail="Hub inválido ou menus não encontrados."
         )
-
+    
+    usuario = request.session.get("username")
+    if not usuario:
+        return RedirectResponse(url="/?error=Não autenticado", status_code=303)
+    
     return templates.TemplateResponse(
         "index.html",
         {
@@ -167,6 +181,10 @@ async def powerbi_hubs(request: Request, hub: str):
     if not src_link:
         raise HTTPException(status_code=400, detail="Link do Power BI não encontrado.")
     sidebar_items = hubs.get_sidebar_by_hub(hub)
+    usuario = request.session.get("username")
+    if not usuario:
+        return RedirectResponse(url="/?error=Não autenticado", status_code=303)
+    
     return templates.TemplateResponse(
         "powerbi.html",
         {
@@ -186,6 +204,10 @@ async def calendario_hubs(request: Request, hub: str):
         raise HTTPException(
             status_code=400, detail="Hub inválido ou template não encontrado."
         )
+    usuario = request.session.get("username")
+    if not usuario:
+        return RedirectResponse(url="/?error=Não autenticado", status_code=303)
+    
     return templates.TemplateResponse(template, {"request": request, "config": config})
 
 
@@ -231,6 +253,10 @@ async def agenda_hubs(
     ]
 
     sidebar_items = hubs.get_sidebar_by_hub(hub)
+    usuario = request.session.get("username")
+    if not usuario:
+        return RedirectResponse(url="/?error=Não autenticado", status_code=303)
+    
     return templates.TemplateResponse(
         "agenda.html",
         {
@@ -290,7 +316,10 @@ async def netproject_hubs(
         for item in demanda
         if (item.cod_projeto, item.nom_usuario) in differences_ids
     ]
-
+    usuario = request.session.get("username")
+    if not usuario:
+        return RedirectResponse(url="/?error=Não autenticado", status_code=303)
+    
     return templates.TemplateResponse(
         "netproject.html",
         {
@@ -318,7 +347,10 @@ async def edit_demanda(
         raise HTTPException(status_code=404, detail="Demanda não encontrada.")
 
     hub_name_sem_acentos = remover_acentos(hubs.get_nome_legivel(hub))
-
+    usuario = request.session.get("username")
+    if not usuario:
+        return RedirectResponse(url="/?error=Não autenticado", status_code=303)
+    
     return templates.TemplateResponse(
         template,
         {
@@ -424,7 +456,10 @@ async def edit_agenda(
 
     hub_name_sem_acentos = remover_acentos(hubs.get_nome_legivel(hub))
 
-
+    usuario = request.session.get("username")
+    if not usuario:
+        return RedirectResponse(url="/?error=Não autenticado", status_code=303)
+    
     return templates.TemplateResponse(
         template,
         {
@@ -493,7 +528,10 @@ async def cad_nao_programadas(request: Request, hub: str):
     hub_name = hubs.get_nome_legivel(hub)
     hub_name_sem_acentos = remover_acentos(hubs.get_nome_legivel(hub))
     colaboradores = hubs.get_colaboradores_por_hub(hub)
-
+    usuario = request.session.get("username")
+    if not usuario:
+        return RedirectResponse(url="/?error=Não autenticado", status_code=303)
+    
     return templates.TemplateResponse(
         "nao_programadas.html",
         {
@@ -503,7 +541,8 @@ async def cad_nao_programadas(request: Request, hub: str):
             "sidebar_items": sidebar_items,
             "hub_banco": hub_name_sem_acentos,
             "sidebar_items": SIDEBAR_MENUS.get(hub.upper(), []),
-            "colaboradores": colaboradores
+            "colaboradores": colaboradores,
+            "hub_id": hub,
 
         },
     )
@@ -569,7 +608,10 @@ async def aquisicao(
         )
 
     dados = db.query(model_class).all()
-
+    usuario = request.session.get("username")
+    if not usuario:
+        return RedirectResponse(url="/?error=Não autenticado", status_code=303)
+    
     return templates.TemplateResponse(
         "aquisicao.html",
         {

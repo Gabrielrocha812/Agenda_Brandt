@@ -1,12 +1,12 @@
 <div class="d-flex flex-column p-3 vh-100 bg-white border-end" style="width: 240px;">
   <!-- Logo + título -->
-  <a href="/" class="d-flex align-items-center mb-4 text-decoration-none">
+  <a href="#" class="d-flex align-items-center mb-4 text-decoration-none">
     <img src="/static/assets/images/logo_brandt.png" alt="Logo" width="32" class="me-2">
     <span class="fs-5 fw-semibold text-dark">Brandt Meio Ambiente</span>
   </a>
 
   <!-- Menu -->
-  <ul class="nav nav-pills flex-column gap-2">
+  <ul class="nav nav-pills flex-column gap-2 mb-auto">
     {% for item in sidebar_items %}
       <li class="nav-item">
         <a href="{{ item.href }}" class="nav-link d-flex align-items-center text-dark {% if request.url.path == item.href %}active bg-primary text-white{% endif %}">
@@ -16,8 +16,23 @@
     {% endfor %}
   </ul>
 
-  <!-- Rodapé opcional -->
-  <div class="mt-auto pt-4 small text-muted">
+  <!-- Perfil do usuário -->
+  <div class="border-top pt-3 mt-3">
+    <div class="d-flex align-items-center">
+      <div class="rounded-circle bg-primary text-white d-flex justify-content-center align-items-center me-2" style="width: 36px; height: 36px;">
+        <i class="bi bi-person"></i>
+      </div>
+      <div>
+        <div class="fw-semibold text-dark small">{{ request.session.get("username") }}</div>
+        <a href="/logout" class="text-danger small text-decoration-none">
+          <i class="bi bi-box-arrow-right me-1"></i>Sair
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rodapé -->
+  <div class="pt-4 small text-muted">
     <span>&copy; 2025 Brandt</span>
   </div>
 </div>
