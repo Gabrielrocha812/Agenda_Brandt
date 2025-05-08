@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Aquisição - {{ hub_name }}</h2>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover table-bordered align-middle shadow-sm rounded" id="tabela">
+      <thead class="table-light">
+        <tr>
+          <th>Projeto</th>
+          <th>Atividade Macro</th>
+          <th>Atividade</th>
+          <th>Responsável</th>
+          <th>Início NP</th>
+          <th>Fim NP</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for rs in data %}
+        <tr>
+          <td>{{ rs.cod_projeto_alfa }}</td>
+          <td>{{ rs.pai_aquisicao }}</td>
+          <td>{{ rs.nom_projeto }}</td>
+          <td>{{ rs.txt_comentario }}</td>
+          <td>{{ rs.dth_inicio_real }}</td>
+          <td>{{ rs.dth_fim_real }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    new DataTable('#tabela', {
+      language: {
+        url: "https://cdn.datatables.net/plug-ins/1.11.3/i18n/pt_br.json"
+      },
+      pageLength: 10,
+      lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+    });
+  });
+</script>
+{% endblock %}

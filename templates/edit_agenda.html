@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+  <form id="formEdit" action="/editAgenda/{{ hub_id }}/{{ demanda.id }}" method="post" onsubmit="return validarHoras()" class="card p-4 shadow rounded-4 mx-auto" style="max-width: 700px;">
+    <h3 class="text-center mb-4">Editar Atividade - {{ hub_name.capitalize() }}</h3>
+
+    <input type="hidden" name="cod_projeto" value="{{ demanda.cod_projeto }}">
+    <input type="hidden" name="hub_banco" value="{{ hub_banco.upper() }}">
+
+    <div class="form-floating mb-3">
+      <input type="text" class="form-control" id="titulo" name="titulo" value="{{ demanda.titulo }}" readonly>
+      <label for="titulo">Atividade Macro</label>
+    </div>
+
+    <div class="form-floating mb-3">
+      <input type="text" class="form-control" id="responsavel" name="responsavel" value="{{ demanda.responsavel }}" readonly>
+      <label for="responsavel">Colaborador Responsável</label>
+    </div>
+
+    <div class="form-floating mb-3">
+      <input type="text" class="form-control" id="projeto" name="projeto" value="{{ demanda.projeto }}" readonly>
+      <label for="projeto">Projeto</label>
+    </div>
+
+    <div class="form-floating mb-3">
+      <input type="text" class="form-control" id="atividade" name="atividade" value="{{ demanda.atividade }}" readonly>
+      <label for="atividade">Atividade</label>
+    </div>
+
+    <div class="form-floating mb-3">
+      <input type="date" class="form-control" id="dtinicionp" name="dtinicionp" value="{{ demanda.dtinicionp }}" readonly>
+      <label for="dtinicionp">Data Início Netproject</label>
+    </div>
+
+    <div class="form-floating mb-3">
+      <input type="date" name="dth_inicio" class="form-control" id="datareal" value="{{ demanda.dth_inicio }}">
+      <label for="datareal">Data Início Real</label>
+    </div>
+
+    <div class="form-floating mb-3">
+      <input type="date" class="form-control" id="dtfimnp" name="dtfimnp" value="{{ demanda.dtfimnp }}" readonly>
+      <label for="dtfimnp">Data Fim Netproject</label>
+    </div>
+
+    <div class="form-floating mb-3">
+      <input type="date" name="dth_fim" class="form-control" id="dataFimReal" value="{{ demanda.dth_fim }}">
+      <label for="dataFimReal">Data Fim Real</label>
+    </div>
+
+    <div class="form-floating mb-3">
+      <input type="text" id="horasNoFix" name="horasNP" class="form-control" value="" readonly>
+      <label for="horasNoFix">Horas Netproject</label>
+    </div>
+
+    <div class="form-floating mb-3">
+      <input type="text" name="horas" id="horas" class="form-control" value="{{ demanda.n_hora_hub }}">
+      <label for="horas">Horas Real</label>
+    </div>
+
+    <div class="form-floating mb-4">
+      <select name="status_projeto" id="status_projeto" class="form-select">
+        <option value="{{ demanda.status }}" selected>{{ demanda.status }}</option>
+        <option value="Aguardando Execução">Aguardando Execução</option>
+        <option value="Revisão Cliente">Revisão Cliente</option>
+        <option value="Em Execução">Em Execução</option>
+        <option value="Paralisada">Paralisada</option>
+        <option value="Revisão Brandt">Revisão Brandt</option>
+        <option value="Concluído">Concluído</option>
+        <option value="Cancelado">Cancelado</option>
+        <option value="Não Programada">Não Programada</option>
+      </select>
+      <label for="status_projeto">Status</label>
+    </div>
+
+    <div class="text-center">
+      <button type="submit" class="btn btn-primary btn-lg px-5">Salvar</button>
+    </div>
+  </form>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const horasNPValue = parseFloat("{{ demanda.horas_np }}").toFixed(2);
+    document.getElementById("horasNoFix").value = horasNPValue;
+  });
+
+  const horasNP = parseFloat("{{ demanda.horas_np }}");
+  const dataFimNP = new Date("{{ demanda.dtfimnp }}");
+
+  function validarHoras() {
+    const horas = parseFloat(document.getElementById("horas").value);
+    const dataFimReal = new Date(document.getElementById("dataFimReal").value);
+
+    if (horas && horasNP && horas > horasNP) {
+      alert("As horas não podem ser maiores que as do Netproject.");
+      return false;
+    }
+
+    if (dataFimReal > dataFimNP) {
+      alert("A data de fim real não pode ser maior que a do Netproject.");
+      return false;
+    }
+
+    return true;
+  }
+</script>
+{% endblock javascripts %}

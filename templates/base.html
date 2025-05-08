@@ -21,7 +21,12 @@
   <div class="d-flex">
     <!-- Sidebar fixa -->
     <aside class="d-none d-lg-block bg-white border-end" style="width: 240px; min-height: 100vh;">
-      {% include 'sidebar.html' %}
+      {% set hubs_gerencia = ["Arqueologia Gerência", "Biodiversidade Gerência", "Espeleologia Gerência", "Geointeligência Gerência", "Humanidades Gerência", "Meio Físico Gerência", "Modelagens Gerência", "Gestão Gerência" ] %}
+      {% if hub_name in hubs_gerencia %}
+        {% include 'Gerencia/sidebar.html' %}
+      {% else %}
+        {% include 'sidebar.html' %}
+      {% endif %}
     </aside>
 
     <!-- Sidebar offcanvas (mobile) -->

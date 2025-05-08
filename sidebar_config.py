@@ -10,28 +10,43 @@ def gerar_sidebar_por_hub():
         "calendario": ("Calendario", "fa fa-calendar-alt"),
     }
 
+    # Caso especial para "gerencia"
+    itens_gerencia = []
+
     for hub, templates in mapa_templates.items():
         if len(templates) <= 1:
             continue
 
-        itens = [
-            {"name": "Início", "href": "/", "icon": "fa fa-home"}
-        ]
+        itens_hub = [{"name": "Início", "href": "/", "icon": "fa fa-home"}]
 
         for chave, (label, icon) in rotas_comuns.items():
             if chave in templates:
-                rota = f"/{label}/{hub}"  # Ex: /Netproject/Hum
-                itens.append({"name": label, "href": rota, "icon": icon})
+                rota = f"/{label}/{hub}"
+                itens_hub.append({"name": label, "href": rota, "icon": icon})
 
         if hub in mapa_aquisicao:
-            itens.append({
+            itens_hub.append({
                 "name": "Aquisições",
                 "href": f"/Aquisicao/{hub}",
                 "icon": "fa fa-shopping-cart"
             })
 
-        sidebar[hub.upper()] = itens
+        # Adiciona ao sidebar normal
+        sidebar[hub.upper()] = itens_hub
+
+        # Verifica se o hub deve ser adicionado à gerência
+        if hub.capitalize().endswith("GE"):
+            # Adiciona ao submenu de gerência apenas hubs que terminam com "GE"
+            itens_gerencia.append({
+                "name": hub.upper(),
+                "icon": "fa fa-building",
+                "submenu": itens_hub  # Submenu específico do hub
+            })
+
+    # Adiciona a entrada especial para GERENCIA
+    sidebar["Gerencia"] = itens_gerencia
 
     return sidebar
 
 SIDEBAR_MENUS = gerar_sidebar_por_hub()
+

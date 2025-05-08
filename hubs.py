@@ -1,4 +1,5 @@
 import models
+import sidebar_config
 
 # Dicionário com models de demanda
 mapa_models_demanda = {
@@ -16,6 +17,7 @@ mapa_models_demanda = {
     "MFGe": models.Demandas_MeioFisico,
     "Mod": models.Demandas_Modelagens,
     "ModGe": models.Demandas_Modelagens,
+    "GestaoGe": models.Demandas_Gestao,
 }
 
 # Dicionário com models de horas reais por hub
@@ -34,6 +36,7 @@ mapa_models_hora_real = {
     "MFGe": models.hora_real_mfisico,
     "Mod": models.hora_real_mmodelagens,
     "ModGe": models.hora_real_mmodelagens,
+    "GestaoGe": models.Gestao
 }
 
 # Templates de visualização (agenda, edição, etc.)
@@ -178,12 +181,19 @@ mapa_templates = {
         "index": "./Gerencia/Modelagens/index.html",
         "edit_simples": "./Gerencia/Modelagens/edit.html",
     },
-    "Gerencia": {
-        "index": "./Gerencia/index.html",
-    },
     "MeM": {
         "index": "./mem.html",
-    }
+    },
+    "GestaoGe": {
+        "agenda": "./Gestao/agenda.html",
+        "edit": "./Gestao/edit_agenda.html",
+        "netproject": "./Gestao/netproject.html",
+        "naoprogramadas": "./Gestao/naoprogramadas.html",
+        "calendario": "./Gestao/calendario.html",
+        "powerbi": "./Gestao/PowerBi.html",
+        "index": "./Gestao/index.html",
+        "edit_simples": "./Gestao/edit.html",
+    },
 }
 
 mapa_aquisicao = {
@@ -203,36 +213,137 @@ mapa_aquisicao = {
     "ModGe": ("AquisicaoMod", "./Gerencia/Modelagens/aquisicao.html"),
 }
 
-# Nomes legíveis base
 nomes_hub_legivel_base = {
     "Arq": "Arqueologia",
     "Bio": "Biodiversidade",
     "Esp": "Espeleologia",
-    "Geo": "Geociências",
+    "Geo": "Geointeligência",
     "Hum": "Humanidades",
     "MF": "Meio Físico",
     "Mod": "Modelagens",
-    "MeM": "Meio e Monitoramento",
-    "Gerencia": "Gerência"
+    "Gerencia": "Gerência",
+    "Gestao": "Gestão"
 }
 
+powerbi_links = {
+    "Arq": "https://app.powerbi.com/view?r=eyJrIjoiNzVmYjU1MzEtMDE0NC00MzJlLWE5MjItMDlkY2FmNTkwMWZjIiwidCI6ImJiOTQ0OGUxLWE3YWMtNDQ0MC1iM2YyLTMxZGUwNzFhY2UwNyJ9",
+    "Bio": "https://app.powerbi.com/view?r=eyJrIjoiOGUwOWY0NGItOTY0OC00OTBlLTkwYzctNTBhYjdmYjY4OWEyIiwidCI6ImJiOTQ0OGUxLWE3YWMtNDQ0MC1iM2YyLTMxZGUwNzFhY2UwNyJ9",
+    "Esp": "https://app.powerbi.com/view?r=eyJrIjoiODk4NDUwZmItZTA1YS00ZmIzLWI4ODUtZDk2YTQzYmEyNDNkIiwidCI6ImJiOTQ0OGUxLWE3YWMtNDQ0MC1iM2YyLTMxZGUwNzFhY2UwNyJ9",
+    "Geo": "https://app.powerbi.com/view?r=eyJrIjoiZmMxNDFjMzYtMzIxNS00YWZjLWIxNzYtZmFmOTJmOTVjMGVhIiwidCI6ImJiOTQ0OGUxLWE3YWMtNDQ0MC1iM2YyLTMxZGUwNzFhY2UwNyJ9",
+    "Hum": "https://app.powerbi.com/view?r=eyJrIjoiODlmZGNkMDItNWIzYi00YzBiLTlhNWItM2E1NmE2MmQ0OThiIiwidCI6ImJiOTQ0OGUxLWE3YWMtNDQ0MC1iM2YyLTMxZGUwNzFhY2UwNyJ9",
+    "MF": "https://app.powerbi.com/view?r=eyJrIjoiMWZkNjk4NjItOTA4Zi00NDkwLTkwYmItM2Y2NjUxNjkyZWE4IiwidCI6ImJiOTQ0OGUxLWE3YWMtNDQ0MC1iM2YyLTMxZGUwNzFhY2UwNyJ9",
+    "Mod": "https://app.powerbi.com/view?r=eyJrIjoiYzk2NDk2OWEtOGZmOS00YjZjLThhYjgtODgwYTVhYTQ1YzE1IiwidCI6ImJiOTQ0OGUxLWE3YWMtNDQ0MC1iM2YyLTMxZGUwNzFhY2UwNyJ9",
+}
 
+colaboradores_hubs = {
+    "Arq": [
+        "Deborah Lima Duarte Talim",
+        "Thiago Hycaro Santos Neves",
+        "Valdiney Amaral Leite",
+    ],
+    "Bio": [
+        "Bianca Vidigal Mendes",
+        "Estefania Isabel Pereira",
+        "Lucas Jesus da Silveira",
+        "Maria José Pinheiro Anacléto",
+        "Lorena Anne Santos do Nascimento",
+        "Rodrigo Morais Pessoa",
+        "Ronei Rosa dos Santos",
+    ],
+    "Esp": [
+        "Amailton Araujo Pedrosa",
+        "Antonio Ribeiro Lima",
+        "Breno Felipe Teixeira Gomes Melo",
+        "Carleandro da Paixao Araujo",
+        "Diogo Henrique Granado Checchia",
+        "Diones Dionisio Costa",
+        "Gilson Fernandes Marins",
+        "Gleice de Paula Soares",
+        "Guelmon Conceicao dos Santos",
+        "Pedro Bernardes Machado",
+        "Raimundo Ribeiro Lima",
+        "Renea Rezende Lopes",
+        "Thiago Ferreira Lima",
+        "Valdir Ribeiro Lima",
+        "Vinicius Minelli Moreira",
+    ],
+    "Geo": [
+        "Camila Duarte Guerra",
+        "Davi Daniel Fernandes Santos",
+        "Gabriel Rocha Goncalves de Souza",
+        "Gustavo Adolfo Tinoco Martinez",
+        "Lucas Antonio Brasil Goncalves Lacerda",
+        "Renato de Oliveira Marques",
+        "Wellington Antonio de Oliveira Menez",
+    ],
+    "Hum": ["Ari Silva Gobira", "Luis Eduardo Maia Mallet"],
+    "MF": [
+        "Cesar Augusto Horn",
+        "Fernando Antonio de Oliveira",
+        "Giovanna Neusa Fagundes Marciano",
+        "Marina Fonseca Cotta",
+        "Vinícius Rodrigues dos Santos",
+    ],
+    "Mod": [
+        "Brenda Ribeiro",
+        "Cristiano Lisboa de Andrade",
+        "Elizio Henrique da Silva Soares",
+        "Rafael Felipe Terencio",
+    ],
+    "Gestao": ["Andre Tavares Barbosa", "Leandro Augusto de Freitas Borges", "Frank Carvalho Ferreira"],
 
-# Helpers utilitários
+}
+
 
 def get_model_demanda_by_hub(hub: str):
     return mapa_models_demanda.get(hub)
 
+
 def get_model_hora_real_by_hub(hub: str):
     return mapa_models_hora_real.get(hub)
+
 
 def get_templates_by_hub(hub: str):
     return mapa_templates.get(hub, {})
 
-# Função de nome legível
+
 def get_nome_legivel(hub: str) -> str:
     if hub.endswith("Ge"):
         base = hub[:-2]  # Remove "Ge"
         nome_base = nomes_hub_legivel_base.get(base, base)
         return f"{nome_base} Gerência"
     return nomes_hub_legivel_base.get(hub, hub)
+
+
+def get_powerbi_link(hub: str) -> str:
+    base = hub[:-2] if hub.endswith("Ge") else hub
+    return powerbi_links.get(base, "")
+
+
+def is_gerencia(hub: str) -> bool:
+    return hub.endswith("Ge")
+
+
+def get_sidebar_gerencia():
+    return [
+        {
+            "name": get_nome_legivel(hub),
+            "href": f"/{hub}Ge",
+            "icon": "fa fa-folder",  # ou qualquer ícone padrão, se quiser
+        }
+        for hub in nomes_hub_legivel_base.keys()
+        if hub != "Gerencia" and hub != "MeM"
+    ]
+
+
+def get_sidebar_by_hub(hub: str):
+
+    return sidebar_config.SIDEBAR_MENUS.get(hub.upper(), [])
+
+
+def get_colaboradores_por_hub(hub: str):
+    # Verifica se o nome do hub contém parte da chave
+    for key in colaboradores_hubs:
+        if hub.capitalize().startswith(key.capitalize()):
+            return colaboradores_hubs[key]
+    return []

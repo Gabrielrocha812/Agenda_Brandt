@@ -6,7 +6,7 @@
   <!-- Cabeçalho -->
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="h4 fw-semibold mb-0">Agenda - {{ hub_name }}</h1>
-    <a href="/CadNaoProgramadas/{{ hub_name | capitalize }}" class="btn btn-primary">
+    <a href="/CadNaoProgramadas/{{ hub_id }}" class="btn btn-primary">
       <i class="bi bi-plus-lg me-1"></i> Cadastrar
     </a>
   </div>
@@ -71,10 +71,10 @@
           <td>{{ rs.dtfimnp }}</td>
           <td class="text-center">
             <div class="d-flex justify-content-center gap-2">
-              <a href="/edit/{{ hub_name }}/{{ rs.id }}" class="btn btn-sm btn-outline-primary" title="Editar" data-bs-toggle="tooltip">
+              <a href="/edit_agenda/{{ hub_id }}/{{ rs.id }}" class="btn btn-sm btn-outline-primary" title="Editar" data-bs-toggle="tooltip">
                 <i class="bi bi-pencil"></i>
               </a>
-              <a href="/deletar/{{ hub_name }}/{{ rs.id }}" onclick="return confirm('Deseja excluir {{ rs.atividade }}?')"
+              <a href="/delete/{{ hub_id }}/{{ rs.id }}" onclick="return confirm('Deseja excluir {{ rs.atividade }}?')"
                  class="btn btn-sm btn-outline-danger" title="Excluir" data-bs-toggle="tooltip">
                 <i class="bi bi-trash"></i>
               </a>

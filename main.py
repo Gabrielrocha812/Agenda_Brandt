@@ -1,5 +1,6 @@
+import unicodedata
 from fastapi import Depends, FastAPI, Form, HTTPException, Query, Request
-from fastapi.responses import RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
@@ -67,7 +68,7 @@ def authenticate_with_ad(username: str, password: str):
 
 def get_redirect_url(username: str) -> str:
     user_routes = {
-        "gabriel.rocha": "Arq",
+        "gabriel.rocha": "Gerencia",
         "vleite": "Arq",
         "rodrigo.pessoa": "Bio",
         "tlima": "Esp",
@@ -91,6 +92,12 @@ async def get_Demandas(
     if not model_class:
         raise HTTPException(status_code=400, detail=f"Hub '{hub}' não encontrado.")
     return db.query(model_class).all()
+
+
+def remover_acentos(texto):
+    return (
+        unicodedata.normalize("NFKD", texto).encode("ASCII", "ignore").decode("ASCII")
+    )
 
 
 # Fim Funções
@@ -124,32 +131,52 @@ async def logar(username: str = Form(...), password: str = Form(...)):
 
 # fim endpoints de login
 
+
 # inicio endpoints agenda
+# Gerencia inicio
+@app.get("/Gerencia", response_class=HTMLResponse)
+async def gerencia(request: Request):
+    return templates.TemplateResponse("Gerencia/index.html", {"request": request})
+
+
+# Gerencia fim
 
 
 @app.get("/{hub}")
 async def index_hubs(request: Request, hub: str):
-    sidebar_items = SIDEBAR_MENUS.get(hub.upper())
+    sidebar_items = hubs.get_sidebar_by_hub(hub)
     if not sidebar_items:
         raise HTTPException(
             status_code=400, detail="Hub inválido ou menus não encontrados."
         )
 
-    return templates.TemplateResponse("index.html", {
-        "request": request,
-        "config": config,
-        "hub_name": hub.upper(),
-        "sidebar_items": sidebar_items
-    })
+    return templates.TemplateResponse(
+        "index.html",
+        {
+            "request": request,
+            "config": config,
+            "hub_name": hubs.get_nome_legivel(hub),
+            "sidebar_items": sidebar_items,
+        },
+    )
+
 
 @app.get("/PowerBi/{hub}")
 async def powerbi_hubs(request: Request, hub: str):
-    template = hubs.get_templates_by_hub(hub).get("powerbi")
-    if not template:
-        raise HTTPException(
-            status_code=400, detail="Hub inválido ou template não encontrado."
-        )
-    return templates.TemplateResponse(template, {"request": request, "config": config})
+    src_link = hubs.get_powerbi_link(hub)
+    if not src_link:
+        raise HTTPException(status_code=400, detail="Link do Power BI não encontrado.")
+    sidebar_items = hubs.get_sidebar_by_hub(hub)
+    return templates.TemplateResponse(
+        "powerbi.html",
+        {
+            "request": request,
+            "config": config,
+            "hub_name": hubs.get_nome_legivel(hub),
+            "sidebar_items": sidebar_items,
+            "src": src_link,
+        },
+    )
 
 
 @app.get("/Calendario/{hub}")
@@ -176,60 +203,44 @@ async def agenda_hubs(
         raise HTTPException(status_code=400, detail="Hub inválido.")
 
     query = db.query(model_class)
-
     if data_inicio:
-        data_inicio_dt = datetime.strptime(data_inicio, "%Y-%m-%d")
-        query = query.filter(model_class.dth_fim >= data_inicio_dt)
+        query = query.filter(
+            model_class.dth_fim >= datetime.strptime(data_inicio, "%Y-%m-%d")
+        )
     if data_fim:
-        data_fim_dt = datetime.strptime(data_fim, "%Y-%m-%d")
-        query = query.filter(model_class.dth_inicio <= data_fim_dt)
-
-    demandas = query.all()
-    data = []
-    for demanda in demandas:
-        data.append(
-            {
-                "id": demanda.id,
-                "titulo": demanda.titulo,
-                "hub": demanda.hub,
-                "responsavel": demanda.responsavel,
-                "projeto": demanda.projeto,
-                "atividade": demanda.atividade,
-                "status": demanda.status,
-                "dth_inicio": (
-                    demanda.dth_inicio.strftime("%Y-%m-%d")
-                    if demanda.dth_inicio
-                    else None
-                ),
-                "dth_fim": (
-                    demanda.dth_fim.strftime("%Y-%m-%d") if demanda.dth_fim else None
-                ),
-                "dtinicionp": (
-                    demanda.dtinicionp.strftime("%Y-%m-%d")
-                    if demanda.dtinicionp
-                    else None
-                ),
-                "dtfimnp": (
-                    demanda.dtfimnp.strftime("%Y-%m-%d") if demanda.dtfimnp else None
-                ),
-            }
+        query = query.filter(
+            model_class.dth_inicio <= datetime.strptime(data_fim, "%Y-%m-%d")
         )
 
+    data = [
+        {
+            "id": d.id,
+            "titulo": d.titulo,
+            "hub": d.hub,
+            "responsavel": d.responsavel,
+            "projeto": d.projeto,
+            "atividade": d.atividade,
+            "status": d.status,
+            "dth_inicio": d.dth_inicio.strftime("%Y-%m-%d") if d.dth_inicio else None,
+            "dth_fim": d.dth_fim.strftime("%Y-%m-%d") if d.dth_fim else None,
+            "dtinicionp": d.dtinicionp.strftime("%Y-%m-%d") if d.dtinicionp else None,
+            "dtfimnp": d.dtfimnp.strftime("%Y-%m-%d") if d.dtfimnp else None,
+        }
+        for d in query.all()
+    ]
 
-    sidebar_items = SIDEBAR_MENUS.get(hub.upper())
-    if not sidebar_items:
-        raise HTTPException(status_code=404, detail="Sidebar não encontrada para este hub.")
-
-    hub_formatado = hub.lower()
-
-    return templates.TemplateResponse("agenda.html", {
-        "request": request,
-        "config": config,
-        "data": data,
-        "hub_name": hubs.get_nome_legivel(hub),
-        "sidebar_items": SIDEBAR_MENUS.get(hub.upper(), [])
-    })
-
+    sidebar_items = hubs.get_sidebar_by_hub(hub)
+    return templates.TemplateResponse(
+        "agenda.html",
+        {
+            "request": request,
+            "config": config,
+            "data": data,
+            "hub_name": hubs.get_nome_legivel(hub),
+            "sidebar_items": sidebar_items,
+            "hub_id": hub,
+        },
+    )
 
 
 @app.get("/Netproject/{hub}")
@@ -279,13 +290,17 @@ async def netproject_hubs(
         if (item.cod_projeto, item.nom_usuario) in differences_ids
     ]
 
-    return templates.TemplateResponse("netproject.html", {
-        "request": request,
-        "config": config,
-        "hub_name": hubs.get_nome_legivel(hub),
-        "sidebar_items": SIDEBAR_MENUS.get(hub.upper(), []),
-        "data": data
-    })
+    return templates.TemplateResponse(
+        "netproject.html",
+        {
+            "request": request,
+            "config": config,
+            "hub_name": hubs.get_nome_legivel(hub),
+            "sidebar_items": SIDEBAR_MENUS.get(hub.upper(), []),
+            "data": data,
+            "hub_id": hub,
+        },
+    )
 
 
 @app.get("/edit/{hub}/{id}")
@@ -293,16 +308,27 @@ async def edit_demanda(
     request: Request, hub: str, id: int, db: Session = Depends(get_db)
 ):
     model_class = hubs.get_model_hora_real_by_hub(hub)
-    template = hubs.get_templates_by_hub(hub).get("edit_simples")
-    if not model_class or not template:
+    template = "edit_simples.html"
+    if not model_class:
         raise HTTPException(status_code=400, detail="Hub inválido.")
 
     projeto = db.query(model_class).filter(model_class.id == id).first()
     if not projeto:
         raise HTTPException(status_code=404, detail="Demanda não encontrada.")
 
+    hub_name_sem_acentos = remover_acentos(hubs.get_nome_legivel(hub))
+
     return templates.TemplateResponse(
-        template, {"request": request, "demanda": projeto, "config": config}
+        template,
+        {
+            "request": request,
+            "demanda": projeto,
+            "config": config,
+            "hub_name": hubs.get_nome_legivel(hub),
+            "hub_id": hub,
+            "sidebar_items": SIDEBAR_MENUS.get(hub.upper(), []),
+            "hub_banco": hub_name_sem_acentos
+        },
     )
 
 
@@ -377,9 +403,9 @@ async def edit_agenda(
 ):
     model_demanda = hubs.get_model_demanda_by_hub(hub)
     model_hora = hubs.get_model_hora_real_by_hub(hub)
-    template = hubs.get_templates_by_hub(hub).get("edit")
+    template = "edit_agenda.html"  # Um único template para todos os hubs
 
-    if not model_demanda or not model_hora or not template:
+    if not model_demanda or not model_hora:
         raise HTTPException(status_code=400, detail=f"Hub '{hub}' não é válido.")
 
     projeto = db.query(model_demanda).filter(model_demanda.id == id).first()
@@ -395,6 +421,9 @@ async def edit_agenda(
         .first()
     )
 
+    hub_name_sem_acentos = remover_acentos(hubs.get_nome_legivel(hub))
+
+
     return templates.TemplateResponse(
         template,
         {
@@ -402,6 +431,10 @@ async def edit_agenda(
             "demanda": projeto,
             "netproject": netproject,
             "config": config,
+            "hub_id": hub,
+            "hub_name": hubs.get_nome_legivel(hub),
+            "sidebar_items": SIDEBAR_MENUS.get(hub.upper(), []),
+            "hub_banco": hub_name_sem_acentos
         },
     )
 
@@ -455,12 +488,24 @@ async def edit_agenda_post(
 
 @app.get("/CadNaoProgramadas/{hub}")
 async def cad_nao_programadas(request: Request, hub: str):
-    template = hubs.get_templates_by_hub(hub).get("naoprogramadas")
-    if not template:
-        raise HTTPException(
-            status_code=400, detail="Hub inválido ou template não encontrado."
-        )
-    return templates.TemplateResponse(template, {"request": request, "config": config})
+    sidebar_items = hubs.get_sidebar_by_hub(hub)
+    hub_name = hubs.get_nome_legivel(hub)
+    hub_name_sem_acentos = remover_acentos(hubs.get_nome_legivel(hub))
+    colaboradores = hubs.get_colaboradores_por_hub(hub)
+
+    return templates.TemplateResponse(
+        "nao_programadas.html",
+        {
+            "request": request,
+            "config": config,
+            "hub_name": hub_name,
+            "sidebar_items": sidebar_items,
+            "hub_banco": hub_name_sem_acentos,
+            "sidebar_items": SIDEBAR_MENUS.get(hub.upper(), []),
+            "colaboradores": colaboradores
+
+        },
+    )
 
 
 @app.post("/addNaoProgramadas/{hub}")
@@ -509,9 +554,11 @@ async def aquisicao(
     hub: str,
     db: Session = Depends(get_db),
 ):
-    model_name, template_path = hubs.mapa_aquisicao.get(hub, (None, None))
+    model_name = hubs.mapa_aquisicao.get(hub, (None,))[
+        0
+    ]  # pega apenas o nome do modelo
 
-    if not model_name or not template_path:
+    if not model_name:
         raise HTTPException(status_code=400, detail=f"Hub '{hub}' não é válido.")
 
     model_class = getattr(models, model_name, None)
@@ -523,7 +570,14 @@ async def aquisicao(
     dados = db.query(model_class).all()
 
     return templates.TemplateResponse(
-        template_path, {"request": request, "config": config, "data": dados}
+        "aquisicao.html",
+        {
+            "request": request,
+            "config": config,
+            "data": dados,
+            "hub_name": hubs.get_nome_legivel(hub),
+            "sidebar_items": SIDEBAR_MENUS.get(hub.upper(), []),
+        },
     )
 
 

@@ -1,0 +1,106 @@
+<div class="d-flex flex-column p-3 vh-100 bg-white border-end" style="width: 240px;">
+    <!-- Logo + título -->
+    <a href="/" class="d-flex align-items-center mb-4 text-decoration-none">
+      <img src="/static/assets/images/logo_brandt.png" alt="Logo" width="32" class="me-2">
+      <span class="fs-5 fw-semibold text-dark">Brandt Meio Ambiente</span>
+    </a>
+  
+    <!-- Menu principal -->
+    <ul class="nav nav-pills flex-column gap-2">
+      {% for i in config.SIDEBAR %}
+        <li class="nav-item">
+          <a href="{{ i.href }}" class="nav-link d-flex align-items-center text-dark {% if request.url.path == i.href %}active bg-primary text-white{% endif %}">
+            <i class="{{ i.classe }} me-2"></i> {{ i.name }}
+          </a>
+        </li>
+      {% endfor %}
+  
+      <!-- Seções fixas com subitens colapsáveis -->
+      <li class="nav-item">
+      </li>
+  
+      {% set sections = {
+        'Arqueologia': [
+          ('/Agenda/ArqGe', 'Agenda'),
+          ('/Netproject/ArqGe', 'Dados Netproject'),
+          ('/PowerBi/ArqGe', 'Power Bi'),
+          ('/Calendario/ArqGe', 'Calendário'),
+          ('/Aquisicao/ArqGe', 'Aquisições')
+        ],
+        'Biodiversidade': [
+          ('/Agenda/BioGe', 'Agenda'),
+          ('/Netproject/BioGe', 'Dados Netproject'),
+          ('/PowerBi/BioGe', 'Power Bi'),
+          ('/Calendario/BioGe', 'Calendário'),
+          ('/Aquisicao/BioGe', 'Aquisições')
+        ],
+        'Espeleologia': [
+          ('/Agenda/EspGe', 'Agenda'),
+          ('/Netproject/EspGe', 'Dados Netproject'),
+          ('/PowerBi/EspGe', 'Power Bi'),
+          ('/Calendario/EspGe', 'Calendário'),
+          ('/Aquisicao/EspGe', 'Aquisições')
+        ],
+        'Geointeligência': [
+          ('/Agenda/GeoGe', 'Agenda'),
+          ('/Netproject/GeoGe', 'Dados Netproject'),
+          ('/PowerBi/GeoGe', 'Power Bi'),
+          ('/Calendario/GeoGe', 'Calendário'),
+          ('/Aquisicao/GeoGe', 'Aquisições')
+        ],
+        'Humanidades': [
+          ('/Agenda/HumGe', 'Agenda'),
+          ('/Netproject/HumGe', 'Dados Netproject'),
+          ('/PowerBi/HumGe', 'Power Bi'),
+          ('/Calendario/HumGe', 'Calendário'),
+          ('/Aquisicao/HumGe', 'Aquisições')
+        ],
+        'Meio Físico': [
+          ('/Agenda/MFGe', 'Agenda'),
+          ('/Netproject/MFGe', 'Dados Netproject'),
+          ('/PowerBi/MFGe', 'Power Bi'),
+          ('/Calendario/MFGe', 'Calendário'),
+          ('/Aquisicao/MFGe', 'Aquisições')
+        ],
+        'Modelagens': [
+          ('/Agenda/ModGe', 'Agenda'),
+          ('/Netproject/ModGe', 'Dados Netproject'),
+          ('/PowerBi/ModGe', 'Power Bi'),
+          ('/Calendario/ModGe', 'Calendário'),
+          ('/Aquisicao/ModGe', 'Aquisições')
+        ],
+        'Gestão': [
+        ('/Agenda/GestaoGe', 'Agenda'),
+        ('/Netproject/GestaoGe', 'Dados Netproject'),
+        ('/PowerBi/GestaoGe', 'Power Bi')      
+        ]
+      } %}
+  
+      {% for section, links in sections.items() %}
+        {% set collapse_id = section|lower|replace(" ", "_") %}
+        <li class="nav-item">
+          <a class="nav-link text-dark d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#{{ collapse_id }}" role="button" aria-expanded="false" aria-controls="{{ collapse_id }}">
+            <span>{{ section }}</span>
+            <i class="fas fa-chevron-down small"></i>
+          </a>
+          <div class="collapse ps-3" id="{{ collapse_id }}">
+            <ul class="nav flex-column">
+              {% for link, label in links %}
+                <li class="nav-item">
+                  <a href="{{ link }}" class="nav-link text-dark {% if request.url.path == link %}active bg-primary text-white{% endif %}">
+                    {{ label }}
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  
+    <!-- Rodapé -->
+    <div class="mt-auto pt-4 small text-muted">
+      <span>&copy; 2025 Brandt</span>
+    </div>
+  </div>
+  
