@@ -6,7 +6,7 @@
     <h3 class="text-center mb-4">Editar Atividade - {{ hub_name.capitalize() }}</h3>
 
     <input type="hidden" name="cod_projeto" value="{{ demanda.cod_projeto }}">
-    <input type="hidden" name="hub_banco" value="{{ hub_banco.upper() }}">
+    <input type="hidden" name="hub_banco" value="{{ hub_banco_limpo.upper() }}">
 
     <div class="form-floating mb-3">
       <input type="text" class="form-control" id="titulo" name="titulo" value="{{ demanda.titulo }}" readonly>
@@ -82,29 +82,36 @@
 
 {% block javascripts %}
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const horasNPValue = parseFloat("{{ demanda.horas_np }}").toFixed(2);
-    document.getElementById("horasNoFix").value = horasNPValue;
+  $(document).ready(function(){
+      // Convertendo demanda.horas_np para número e depois formatando para duas casas decimais
+      var horasNPValue = parseFloat("{{ demanda.horas_np }}").toFixed(2);
+
+      // Atualizando o valor do input com id "horasNoFix" com o valor formatado
+      document.getElementById("horasNoFix").value = horasNPValue;
   });
 
-  const horasNP = parseFloat("{{ demanda.horas_np }}");
-  const dataFimNP = new Date("{{ demanda.dtfimnp }}");
+  // Variáveis globais para usar nas funções
+  var horasNPValue = parseFloat("{{ demanda.horas_np }}");
+  var dataInicioNP = new Date("{{ demanda.dtinicionp }}");
+  var dataFimNP = new Date("{{ demanda.dtfimnp }}");
 
   function validarHoras() {
-    const horas = parseFloat(document.getElementById("horas").value);
-    const dataFimReal = new Date(document.getElementById("dataFimReal").value);
+      var horas = parseFloat(document.getElementById("horas").value);
+      var dataFimReal = new Date(document.getElementById("dataFimReal").value);
 
-    if (horas && horasNP && horas > horasNP) {
-      alert("As horas não podem ser maiores que as do Netproject.");
-      return false;
-    }
+      // Validação das horas
+      if (horas && horasNPValue && horas > horasNPValue) {
+          alert("As horas não podem ser maiores do que as horas do projeto!");
+          return false;
+      }
 
-    if (dataFimReal > dataFimNP) {
-      alert("A data de fim real não pode ser maior que a do Netproject.");
-      return false;
-    }
+      // Validação da data de fim real
+      if (dataFimReal > dataFimNP) {
+          alert("A data de fim real não pode ser maior do que a data de fim do Netproject!");
+          return false;
+      }
 
-    return true;
+      return true;
   }
 </script>
 {% endblock javascripts %}

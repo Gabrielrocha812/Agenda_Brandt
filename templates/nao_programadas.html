@@ -5,7 +5,7 @@
   <form id="formAdd" action="/addNaoProgramadas/{{ hub_id }}" method="post" class="card p-4 shadow rounded-4 mx-auto" style="max-width: 700px;">
     <h3 class="text-center mb-4">Demanda Não Planejada - {{ hub_name }}</h3>
 
-    <input type="hidden" name="hub_banco" value="{{ hub_banco.upper() }}">
+    <input type="hidden" name="hub_banco" value="{{ hub_banco_limpo.upper() }}">
 
     <div class="form-floating mb-3">
       <input type="text" class="form-control" id="atividade" name="atividade" placeholder="Atividade" required>

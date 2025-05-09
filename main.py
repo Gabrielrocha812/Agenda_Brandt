@@ -16,6 +16,8 @@ import hubs
 import models
 import hashlib
 
+from hubs import mapa_models_demanda
+
 # Inicio Padroes FastAPI
 app = FastAPI()
 
@@ -75,10 +77,12 @@ def get_redirect_url(username: str) -> str:
         "tlima": "Esp",
         "llacerda": "Geo",
         "agobira": "Hum",
-        "vinicius.santos": "MeM",
-        "clisboa": "MeM",
+        "vinicius.santos": "MF",
+        "clisboa": "Mod",
         "lthays": "Gerencia",
         "msantos": "Gerencia",
+        "davi.santos": "Mod",
+        "artur.cosenza": "Gerencia",
     }
 
     return user_routes.get(username.lower(), "Info")
@@ -99,6 +103,17 @@ def remover_acentos(texto):
     return (
         unicodedata.normalize("NFKD", texto).encode("ASCII", "ignore").decode("ASCII")
     )
+
+
+def limpar_gerencia(texto: str) -> str:
+    texto_normalizado = unicodedata.normalize("NFD", texto)
+    texto_sem_acentos = "".join(
+        c for c in texto_normalizado if unicodedata.category(c) != "Mn"
+    )
+
+    texto_limpo = texto_sem_acentos.lower().replace("gerencia", "").strip()
+
+    return texto_limpo.title() 
 
 
 # Fim Funções
@@ -154,16 +169,26 @@ async def gerencia(request: Request):
 
 @app.get("/{hub}")
 async def index_hubs(request: Request, hub: str):
+    usuario = request.session.get("username")
+    if not usuario:
+        return RedirectResponse(url="/?error=Não autenticado", status_code=303)
+
+    if hub.lower() == "info":
+        return templates.TemplateResponse(
+            "info.html",  # Seu template específico
+            {
+                "request": request,
+                "config": config,
+                "usuario": usuario,
+            },
+        )
+
     sidebar_items = hubs.get_sidebar_by_hub(hub)
     if not sidebar_items:
         raise HTTPException(
             status_code=400, detail="Hub inválido ou menus não encontrados."
         )
-    
-    usuario = request.session.get("username")
-    if not usuario:
-        return RedirectResponse(url="/?error=Não autenticado", status_code=303)
-    
+
     return templates.TemplateResponse(
         "index.html",
         {
@@ -195,20 +220,6 @@ async def powerbi_hubs(request: Request, hub: str):
             "src": src_link,
         },
     )
-
-
-@app.get("/Calendario/{hub}")
-async def calendario_hubs(request: Request, hub: str):
-    template = hubs.get_templates_by_hub(hub).get("calendario")
-    if not template:
-        raise HTTPException(
-            status_code=400, detail="Hub inválido ou template não encontrado."
-        )
-    usuario = request.session.get("username")
-    if not usuario:
-        return RedirectResponse(url="/?error=Não autenticado", status_code=303)
-    
-    return templates.TemplateResponse(template, {"request": request, "config": config})
 
 
 @app.get("/Agenda/{hub}")
@@ -253,6 +264,7 @@ async def agenda_hubs(
     ]
 
     sidebar_items = hubs.get_sidebar_by_hub(hub)
+    
     usuario = request.session.get("username")
     if not usuario:
         return RedirectResponse(url="/?error=Não autenticado", status_code=303)
@@ -266,6 +278,7 @@ async def agenda_hubs(
             "hub_name": hubs.get_nome_legivel(hub),
             "sidebar_items": sidebar_items,
             "hub_id": hub,
+            "hub_name_banco": hubs.get_nome_legivel(hub).replace("GERENCIA", "").strip(),
         },
     )
 
@@ -360,7 +373,8 @@ async def edit_demanda(
             "hub_name": hubs.get_nome_legivel(hub),
             "hub_id": hub,
             "sidebar_items": SIDEBAR_MENUS.get(hub.upper(), []),
-            "hub_banco": hub_name_sem_acentos
+            "hub_banco": hub_name_sem_acentos,
+            "hub_banco_limpo": limpar_gerencia(hub_name_sem_acentos)
         },
     )
 
@@ -470,7 +484,8 @@ async def edit_agenda(
             "hub_id": hub,
             "hub_name": hubs.get_nome_legivel(hub),
             "sidebar_items": SIDEBAR_MENUS.get(hub.upper(), []),
-            "hub_banco": hub_name_sem_acentos
+            "hub_banco": hub_name_sem_acentos,
+            "hub_banco_limpo": limpar_gerencia(hub_name_sem_acentos)
         },
     )
 
@@ -543,7 +558,7 @@ async def cad_nao_programadas(request: Request, hub: str):
             "sidebar_items": SIDEBAR_MENUS.get(hub.upper(), []),
             "colaboradores": colaboradores,
             "hub_id": hub,
-
+            "hub_banco_limpo": limpar_gerencia(hub_name_sem_acentos)
         },
     )
 
@@ -596,7 +611,7 @@ async def aquisicao(
 ):
     model_name = hubs.mapa_aquisicao.get(hub, (None,))[
         0
-    ]  # pega apenas o nome do modelo
+    ] 
 
     if not model_name:
         raise HTTPException(status_code=400, detail=f"Hub '{hub}' não é válido.")
@@ -618,6 +633,71 @@ async def aquisicao(
             "request": request,
             "config": config,
             "data": dados,
+            "hub_name": hubs.get_nome_legivel(hub),
+            "sidebar_items": SIDEBAR_MENUS.get(hub.upper(), []),
+        },
+    )
+
+@app.get("/Calendario/{hub}/json")
+async def calendario_json(hub: str, db: Session = Depends(get_db)):
+    if hub not in mapa_models_demanda:
+        raise HTTPException(status_code=404, detail=f"Hub '{hub}' não encontrado.")
+
+    Model = mapa_models_demanda[hub]
+    demandas = db.query(Model).all()
+
+    eventos = []
+    for demanda in demandas:
+        evento = {
+            "title": demanda.responsavel or "Sem responsável",
+            "start": demanda.dth_inicio.isoformat() if demanda.dth_inicio else None,
+            "end": demanda.dth_fim.isoformat() if demanda.dth_fim else None,
+            "colaborador": demanda.responsavel or "",
+            "projeto": demanda.projeto or "",
+            "atividade": demanda.atividade or "",
+            "hub": demanda.hub or "",
+            "status": demanda.status or "",
+        }
+        eventos.append(evento)
+
+    return eventos     
+
+
+@app.get("/Calendario/{hub}")
+async def calendario_hubs(request: Request, hub: str, db: Session = Depends(get_db)):
+    # Buscar o template pelo hub
+    template = hubs.get_templates_by_hub(hub).get("calendario")
+    if not template:
+        raise HTTPException(
+            status_code=400, detail="Hub inválido ou template não encontrado."
+        )
+
+    # Verifica se o modelo de demanda existe para o hub
+    modelo = mapa_models_demanda.get(hub)
+    if not modelo:
+        raise HTTPException(status_code=400, detail="Hub inválido (modelo não encontrado).")
+
+    # Consulta as demandas do banco
+    demandas = db.query(modelo).all()
+
+    eventos = []
+    for demanda in demandas:
+        eventos.append({
+            "title": demanda.titulo,                # Responsável pelo evento
+            "start": demanda.dth_inicio.isoformat() if demanda.dth_inicio else None,
+            "end": demanda.dth_fim.isoformat() if demanda.dth_fim else None,
+            "colaborador": demanda.responsavel,
+            "projeto": demanda.projeto,
+            "atividade": demanda.atividade,
+            "description": demanda.status               # Usando "status" como descrição
+        })
+
+    return templates.TemplateResponse(
+        template,  {
+            "request": request,
+            "config": config,
+            "evento": eventos,
+            "hub":hub,
             "hub_name": hubs.get_nome_legivel(hub),
             "sidebar_items": SIDEBAR_MENUS.get(hub.upper(), []),
         },
